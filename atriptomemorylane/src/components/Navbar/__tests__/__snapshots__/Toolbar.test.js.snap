@@ -1,0 +1,222 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`renders navbar 1`] = `
+<nav
+  className="navbar-inner navbar navbar-expand-lg navbar-dark bg-dark fixed-top"
+>
+  <span
+    className="navbar-brand"
+  >
+    <a
+      className="navbar-inner"
+      href="/"
+    >
+      <img
+        alt="no image :("
+        src="logo.png"
+      />
+    </a>
+  </span>
+  <button
+    aria-controls="responsive-navbar-nav"
+    aria-label="Toggle navigation"
+    className="navbar-toggler collapsed"
+    onClick={[Function]}
+    type="button"
+  >
+    <span
+      className="navbar-toggler-icon"
+    />
+  </button>
+  <div
+    aria-expanded={null}
+    className="navbar-collapse collapse"
+    id="responsive-navbar-nav"
+  >
+    <div
+      className="mr-auto navbar-nav"
+      onKeyDown={[Function]}
+    >
+      <a
+        className="nav-link"
+        data-rb-event-key="/Memories"
+        href="/Memories"
+        onClick={[Function]}
+        onKeyDown={[Function]}
+      >
+        Memories
+      </a>
+      <a
+        className="nav-link"
+        data-rb-event-key="/CreateNewMemories"
+        href="/CreateNewMemories"
+        onClick={[Function]}
+        onKeyDown={[Function]}
+      >
+        Create new memories
+      </a>
+      <a
+        className="nav-link"
+        data-rb-event-key="/Login"
+        href="/Login"
+        onClick={[Function]}
+        onKeyDown={[Function]}
+      >
+        Log in
+      </a>
+      <a
+        className="nav-link"
+        data-rb-event-key="/Signup"
+        href="/Signup"
+        onClick={[Function]}
+        onKeyDown={[Function]}
+      >
+        Create new account
+      </a>
+      <a
+        className="nav-link"
+        data-rb-event-key="/About"
+        href="/About"
+        onClick={[Function]}
+        onKeyDown={[Function]}
+      >
+        About
+      </a>
+    </div>
+  </div>
+  <nav
+    aria-label="breadcrumb"
+  >
+    <ol
+      className="breadcrumb"
+    >
+      <li
+        className="breadcrumb-item"
+      >
+        <a
+          href="/"
+          onClick={[Function]}
+          onKeyDown={[Function]}
+        >
+          Home
+        </a>
+      </li>
+      <li
+        className="breadcrumb-item"
+      >
+        <a
+          href="/Memories"
+          onClick={[Function]}
+          onKeyDown={[Function]}
+        >
+          Memories
+        </a>
+      </li>
+    </ol>
+  </nav>
+  <div
+    className="dropdown"
+    data-test="dropdown"
+    onKeyDown={[Function]}
+  >
+    <button
+      aria-expanded={false}
+      aria-haspopup={true}
+      className="btn-dark btn Ripple-parent dropdown-toggle"
+      data-test="button"
+      onClick={[Function]}
+      onMouseUp={[Function]}
+      onTouchStart={[Function]}
+      type="button"
+    >
+      Continents quickfind
+      <div
+        className="Ripple "
+        data-test="waves"
+        style={
+          Object {
+            "height": "0px",
+            "left": "0px",
+            "top": "0px",
+            "width": "0px",
+          }
+        }
+      />
+    </button>
+    <div
+      className="basic dropdown-menu"
+      style={
+        Object {
+          "left": 0,
+          "opacity": 0,
+          "pointerEvents": "none",
+          "position": "absolute",
+          "top": 0,
+        }
+      }
+    >
+      <div
+        aria-hidden={true}
+        data-test="dropdown-menu-component"
+        role="menu"
+        tabIndex="-1"
+      >
+        <a
+          className="dropdown-item"
+          data-test="dropdown-item"
+          href="/Africa"
+          onClick={[Function]}
+          tabIndex="0"
+        >
+          Africa
+        </a>
+        <a
+          className="dropdown-item"
+          data-test="dropdown-item"
+          href="/Asia"
+          onClick={[Function]}
+          tabIndex="0"
+        >
+          Asia
+        </a>
+        <a
+          className="dropdown-item"
+          data-test="dropdown-item"
+          href="/Europe"
+          onClick={[Function]}
+          tabIndex="0"
+        >
+          Europe
+        </a>
+        <a
+          className="dropdown-item"
+          data-test="dropdown-item"
+          href="/Oceania"
+          onClick={[Function]}
+          tabIndex="0"
+        >
+          Oceania
+        </a>
+        <a
+          className="dropdown-item"
+          data-test="dropdown-item"
+          href="/NorthAmerica"
+          onClick={[Function]}
+          tabIndex="0"
+        >
+          North America
+        </a>
+        <a
+          className="dropdown-item"
+          data-test="dropdown-item"
+          href="/SouthAmerica"
+          onClick={[Function]}
+          tabIndex="0"
+        >
+          South America
+        </a>
+      </div>
+    </div>
+  </div>
+</nav>
+`;

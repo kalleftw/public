@@ -1,0 +1,33 @@
+
+#height {
+  height: 500px;
+  
+}
+
+.weather-top {
+  margin-top: 50px;
+}
+
+.beer {
+  float:left;  
+  width:25%; 
+  height:280px; 
+}
+
+.hostel {
+  float:left;  
+  width:25%; 
+  height:280px; 
+}
+
+.food {
+  float:right; 
+  width:25%; 
+  height:280px; 
+}
+
+.recommended {
+  float:right; 
+  width:25%; 
+  height:280px; 
+}

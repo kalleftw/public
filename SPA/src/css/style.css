@@ -1,0 +1,52 @@
+body {
+    background: url('https://images.pexels.com/photos/1037992/pexels-photo-1037992.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260');
+    background-size: cover;
+  }
+
+ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: rgb(113, 116, 116);
+    bottom: 0;
+    position: fixed;
+    width: 100%;
+    opacity: 0.8;
+    
+  }
+  
+  li {
+    float: left;
+    
+  }
+  
+  li a {
+    display: block;
+    color: white;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+    
+  }
+  
+  li a:hover {
+    background-color: #111;
+  }
+  .active {
+    background-color: #4CAF50;
+  }
+
+  /* Create three unequal columns that floats next to each other */
+ 
+
+  window-board {
+  display: block;
+  position: absolute;
+}
+
+li img {
+  height: 30px;
+  
+  
+}

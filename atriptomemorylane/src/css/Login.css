@@ -1,0 +1,13 @@
+.main {
+    margin: auto;
+    padding-top: 100px;
+    width: 50%;
+}
+
+.signup {
+    background-color: red;
+}
+
+#registerText {
+    color: blue;
+}

@@ -1,0 +1,73 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: user-config
+data:
+  MYSQL_ROOT_PASSWORD: janne
+  MYSQL_USER: janne
+  MYSQL_PASSWORD: janne
+  MYSQL_DATABASE: jannes_databas
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: nfs-pv-store-maria
+spec:
+  accessModes:
+    - ReadWriteMany
+  capacity:
+    storage: 65Gi
+  nfs:
+    path: /export/kubedata
+    server: "172.168.0.14"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: maria-pvc
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 15Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mariadb
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mariadb
+  template:
+    metadata:
+      labels:
+        app: mariadb
+    spec:
+      containers:
+        - name: maria
+          image: 172.168.0.8:5000/mariadb
+          volumeMounts:
+            - mountPath: /var/lib/mysql
+              name: mariadb
+          envFrom:
+            - configMapRef:
+                name: user-config
+      volumes:
+        - name: mariadb
+          persistentVolumeClaim:
+            claimName: maria-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mariadb-rest
+spec:
+  selector:
+    app: mariadb
+  ports:
+    - name: http
+      protocol: TCP
+      port: 3306

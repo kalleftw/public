@@ -1,0 +1,71 @@
+{
+  "name": "atriptomemorylane",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@material-ui/core": "^4.9.13",
+    "@material-ui/icons": "^4.9.1",
+    "@react-google-maps/api": "^1.9.0",
+    "@testing-library/jest-dom": "^4.2.4",
+    "@testing-library/react": "^9.5.0",
+    "@testing-library/user-event": "^7.2.1",
+    "@trendmicro/react-sidenav": "^0.5.0",
+    "bootstrap": "^4.4.1",
+    "disqus-react": "^1.0.8",
+    "final-form": "^4.19.1",
+    "google-recaptcha-react-component": "^2.1.0",
+    "jest-matcher-utils": "^26.0.1",
+    "leaflet": "^1.6.0",
+    "leaflet-geosearch": "^2.7.0",
+    "mdbreact": "^4.26.0",
+    "prop-types": "^15.7.2",
+    "react": "^16.13.1",
+    "react-bootstrap": "^1.0.1",
+    "react-bootstrap-range-slider": "^0.3.2",
+    "react-bootstrap-star-rating": "^3.5.5-alpha.0.3",
+    "react-burger-menu": "^2.6.13",
+    "react-disqus-comments": "^1.4.0",
+    "react-dom": "^16.13.1",
+    "react-final-form": "^6.4.0",
+    "react-geocode": "^0.2.1",
+    "react-google-recaptcha": "^2.0.1",
+    "react-hook-form": "^5.6.1",
+    "react-icons": "^3.10.0",
+    "react-image-gallery": "^0.8.7",
+    "react-leaflet": "^2.6.3",
+    "react-map-gl": "^5.2.5",
+    "react-map-gl-geocoder": "^2.0.11",
+    "react-open-weather": "^0.6.2",
+    "react-recaptcha": "^2.3.10",
+    "react-redux": "^7.2.0",
+    "react-router-dom": "^5.1.2",
+    "react-scripts": "3.4.1",
+    "redux": "^4.0.5",
+    "redux-thunk": "^2.3.0",
+    "weather-icons": "git+https://github.com/erikflowers/weather-icons.git"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": "react-app"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "react-test-renderer": "^16.13.1"
+  }
+}

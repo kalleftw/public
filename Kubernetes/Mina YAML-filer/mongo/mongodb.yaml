@@ -1,0 +1,71 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: user-config
+data:
+  MONGO_INITDB_ROOT_USERNAME: janne
+  MONGO_INITDB_ROOT_PASSWORD: janne
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: nfs-pv-store-mongo
+spec:
+  accessModes:
+    - ReadWriteMany
+  capacity:
+    storage: 65Gi
+  nfs:
+    path: /mongo/kubedata/
+    server: "172.168.0.14"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mongodb-pvc
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 15Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongodb
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongodb
+  template:
+    metadata:
+      labels:
+        app: mongodb
+    spec:
+      containers:
+        - name: mongo
+          image: mongo:latest
+          volumeMounts:
+            - mountPath: /data/db
+              name: mongodb
+          envFrom:
+          - configMapRef:
+              name: user-config
+      volumes:
+        - name: mongodb
+          persistentVolumeClaim:
+            claimName: mongodb-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongodb-rest
+spec:
+  selector:
+    app: mongodb
+  ports:
+    - protocol: TCP
+      port: 27017

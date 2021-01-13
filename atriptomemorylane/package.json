@@ -1,0 +1,58 @@
+{
+  "name": "atriptomemorylane",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@testing-library/jest-dom": "^5.9.0",
+    "bootstrap": "^4.4.1",
+    "firebase": "^7.14.6",
+    "jest-dom": "^4.0.0",
+    "leaflet-geosearch": "^2.7.0",
+    "mapbox-gl": "^1.10.1",
+    "mdbreact": "^4.26.0",
+    "react": "^16.13.1",
+    "react-bootstrap": "^1.0.1",
+    "react-bootstrap-range-slider": "^0.3.2",
+    "react-bootstrap-star-rating": "^3.5.5-alpha.0.3",
+    "react-burger-menu": "^2.6.13",
+    "react-dom": "^16.13.1",
+    "react-final-form": "^6.4.0",
+    "react-hook-form": "^5.6.1",
+    "react-icons": "^3.10.0",
+    "react-router-dom": "^5.1.2",
+    "react-scripts": "3.4.1",
+    "weather-icons": "git+https://github.com/erikflowers/weather-icons.git"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "coverage": "react-scripts test --env=jsdom --watchAll=false --coverage",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": "react-app"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "enzyme": "^3.11.0",
+    "firestore-jest-mock": "^0.4.0",
+    "react-addons-test-utils": "^15.6.2",
+    "react-test-renderer": "^16.13.1"
+  },
+  "description": "This project was bootstrappd with [Create React App](https://github.com/facebook/create-react-app).",
+  "main": "index.js",
+  "author": "",
+  "license": "ISC"
+}

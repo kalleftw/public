@@ -1,0 +1,36 @@
+.Carousel {
+    margin: auto;
+     height: 100%; 
+     width: 100%;
+    position: relative; 
+    max-height: 40%;
+    background-size:100% 100%;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+    -webkit-background-size: contain;
+        -moz-background-size: contain;
+        -o-background-size: contain;
+        background-size: contain;
+}
+
+carousel-item {
+    transition-duration: 0.5s;
+    transition: 0.5s;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+  }
+
+
+/* 
+ .image_carousel {
+    float: left;
+    height: 100%;
+    min-height: 100%;
+    max-width: 100%;
+ }
+
+  */

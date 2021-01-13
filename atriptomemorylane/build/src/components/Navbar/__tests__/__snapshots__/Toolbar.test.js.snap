@@ -1,0 +1,168 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`renders navbar 1`] = `
+<nav
+  className="navbar-inner navbar navbar-expand-lg navbar-dark bg-dark fixed-top"
+>
+  <span
+    className="navbar-brand"
+  >
+    <a
+      className="navbar-inner"
+      href="/"
+    >
+      <img
+        src="logo.png"
+      />
+    </a>
+  </span>
+  <button
+    aria-controls="responsive-navbar-nav"
+    aria-label="Toggle navigation"
+    className="navbar-toggler collapsed"
+    onClick={[Function]}
+    type="button"
+  >
+    <span
+      className="navbar-toggler-icon"
+    />
+  </button>
+  <div
+    aria-expanded={null}
+    className="navbar-collapse collapse"
+    id="responsive-navbar-nav"
+  >
+    <div
+      className="mr-auto navbar-nav"
+      onKeyDown={[Function]}
+    >
+      <a
+        className="nav-link"
+        data-rb-event-key="/Memories"
+        href="/Memories"
+        onClick={[Function]}
+        onKeyDown={[Function]}
+      >
+        Memories
+      </a>
+      <a
+        className="nav-link"
+        data-rb-event-key="/CreateNewMemories"
+        href="/CreateNewMemories"
+        onClick={[Function]}
+        onKeyDown={[Function]}
+      >
+        Create new memories
+      </a>
+      <div
+        className="dropdown nav-item"
+        onKeyDown={[Function]}
+      >
+        <a
+          aria-expanded={false}
+          aria-haspopup={true}
+          className="dropdown-toggle nav-link"
+          data-rb-event-key={null}
+          href="#"
+          id="collasible-nav-dropdown"
+          onClick={[Function]}
+          onKeyDown={[Function]}
+          role="button"
+        >
+          Find memories
+        </a>
+      </div>
+      <a
+        className="nav-link"
+        data-rb-event-key="/Login"
+        href="/Login"
+        onClick={[Function]}
+        onKeyDown={[Function]}
+      >
+        Login
+      </a>
+      <a
+        className="nav-link"
+        data-rb-event-key="/About"
+        href="/About"
+        onClick={[Function]}
+        onKeyDown={[Function]}
+      >
+        About
+      </a>
+    </div>
+  </div>
+  <nav
+    aria-label="breadcrumb"
+  >
+    <ol
+      className="breadcrumb"
+    >
+      <li
+        className="breadcrumb-item"
+      >
+        <a
+          href="/"
+          onClick={[Function]}
+          onKeyDown={[Function]}
+        >
+          Home
+        </a>
+      </li>
+      <li
+        className="breadcrumb-item"
+      >
+        <a
+          href="/Memories"
+          onClick={[Function]}
+          onKeyDown={[Function]}
+        >
+          Memories
+        </a>
+      </li>
+    </ol>
+  </nav>
+  <div
+    className="dropdown"
+    data-test="dropdown"
+    onKeyDown={[Function]}
+  >
+    <button
+      aria-expanded={false}
+      aria-haspopup={true}
+      className="btn-dark btn Ripple-parent dropdown-toggle"
+      data-test="button"
+      onClick={[Function]}
+      onMouseUp={[Function]}
+      onTouchStart={[Function]}
+      type="button"
+    >
+      Continents quickfind
+      <div
+        className="Ripple "
+        data-test="waves"
+        style={
+          Object {
+            "height": "0px",
+            "left": "0px",
+            "top": "0px",
+            "width": "0px",
+          }
+        }
+      />
+    </button>
+    <div
+      className="basic dropdown-menu"
+      style={
+        Object {
+          "left": 0,
+          "opacity": 0,
+          "pointerEvents": "none",
+          "position": "absolute",
+          "top": 0,
+        }
+      }
+    />
+  </div>
+</nav>
+`;

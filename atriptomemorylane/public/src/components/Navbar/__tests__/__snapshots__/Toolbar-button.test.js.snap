@@ -1,0 +1,46 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`renders navbar 1`] = `
+<a
+  className="nav-link"
+  href="/CreateNewMemories"
+  onClick={[Function]}
+  onKeyDown={[Function]}
+/>
+`;
+
+exports[`renders navbar link to About 1`] = `
+<a
+  className="nav-link"
+  href="/About"
+  onClick={[Function]}
+  onKeyDown={[Function]}
+/>
+`;
+
+exports[`renders navbar link to CreateNewMemories 1`] = `
+<a
+  className="nav-link"
+  href="/CreateNewMemories"
+  onClick={[Function]}
+  onKeyDown={[Function]}
+/>
+`;
+
+exports[`renders navbar link to Login 1`] = `
+<a
+  className="nav-link"
+  href="/Login"
+  onClick={[Function]}
+  onKeyDown={[Function]}
+/>
+`;
+
+exports[`renders navbar link to Memories 1`] = `
+<a
+  className="nav-link"
+  href="/Memories"
+  onClick={[Function]}
+  onKeyDown={[Function]}
+/>
+`;

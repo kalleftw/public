@@ -1,0 +1,44 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: loginsvc-config
+data:
+  MARIADB_SERVER_ADDR: '10.104.54.254'
+  MARIADB_SERVER_PORT: '3306'
+  MARIADB_DB_USER: 'janne'
+  MARIADB_DB_PASSWORD: 'janne'
+  MARIADB_DB_NAME: 'jannes_databas'
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: loginsvc
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: loginsvc
+  template:
+    metadata:
+      labels:
+        app: loginsvc
+    spec:
+      containers:
+        - name: loginsvc
+          image: 172.168.0.8:5000/loginsvc
+          envFrom:
+            - configMapRef:
+                name: loginsvc-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: loginsvc-rest
+spec:
+  selector:
+    app: loginsvc
+  ports:
+    - protocol: TCP
+      port: 7070
+

@@ -1,0 +1,16 @@
+#minimalistintro .view {
+    min-height: 100vh !important;
+    height: unset !important;
+    margin: auto;
+    height: 100%; 
+    width: 100%;
+   position: relative; 
+
+  }
+
+  #minimalistintro {
+    margin: auto;
+    height: 100%; 
+    width: 100%;
+   position: relative; 
+  }
