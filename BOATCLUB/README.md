@@ -1,8 +1,3 @@
-# This application was made by:
-- Karl Ekberg (ke222rp)
-- Jon Mester (jc222rz)
-
-
 # Yacht Club Application
 This is a project for the course 1DV607 at Linnaeus University. It is supposed to be a In this repository you will find:
 
