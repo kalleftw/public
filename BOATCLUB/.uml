@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>JAVA</ID>
+  <OriginalElement />
+  <nodes>
+    <node x="306.6671204257853" y="541.21875">handlers.BoatHandler</node>
+    <node x="99.2470575172108" y="181.21875">view.View</node>
+    <node x="554.281371242701" y="431.21875">handlers.JsonHandler</node>
+    <node x="437.2749635630402" y="681.21875">Console</node>
+    <node x="73.2470575172108" y="1.21875">view.Input</node>
+    <node x="406.878689743719" y="1.21875">models</node>
+    <node x="518.083787092452" y="541.21875">handlers.DBHandler</node>
+    <node x="62.284313725490165" y="541.21875">handlers.SearchHandler</node>
+    <node x="194.55588104662257" y="431.21875">handlers.MemberHandler</node>
+    <node x="390.6671204257853" y="301.21875">handlers.AuthHandler</node>
+    <node x="18.387192665207408" y="761.21875">Main</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="view.View" target="view.Input">
+      <point x="-26.66666666666667" y="-15.0" />
+      <point x="112.58039085054412" y="161.21875" />
+      <point x="95.2470575172108" y="161.21875" />
+      <point x="-22.0" y="15.0" />
+    </edge>
+    <edge source="view.View" target="models">
+      <point x="26.666666666666657" y="-15.0" />
+      <point x="165.91372418387746" y="101.21875" />
+      <point x="440.98395290161375" y="101.21875" />
+      <point x="-37.89473684210526" y="15.0" />
+    </edge>
+    <edge source="Console" target="handlers.MemberHandler">
+      <point x="-18.35294117647061" y="-15.0" />
+      <point x="470.9220223865696" y="611.21875" />
+      <point x="248.45098039215677" y="611.21875" />
+      <point x="248.45098039215677" y="521.21875" />
+      <point x="283.2225477132892" y="521.21875" />
+      <point x="12.666666666666629" y="15.0" />
+    </edge>
+    <edge source="handlers.MemberHandler" target="models">
+      <point x="0.0" y="-15.0" />
+      <point x="270.5558810466226" y="381.21875" />
+      <point x="322.1276467415748" y="381.21875" />
+      <point x="322.1276467415748" y="131.21875" />
+      <point x="463.7207950068769" y="131.21875" />
+      <point x="-15.157894736842081" y="15.0" />
+    </edge>
+    <edge source="handlers.SearchHandler" target="view.View">
+      <point x="-60.80000000000001" y="-15.0" />
+      <point x="77.48431372549015" y="511.21875" />
+      <point x="106.75483972403089" y="511.21875" />
+      <point x="106.75483972403089" y="271.21875" />
+      <point x="129.2470575172108" y="271.21875" />
+      <point x="-10.0" y="15.0" />
+    </edge>
+    <edge source="handlers.BoatHandler" target="view.View">
+      <point x="-8.5" y="-15.0" />
+      <point x="366.1671204257853" y="521.21875" />
+      <point x="357.0558810466226" y="521.21875" />
+      <point x="357.0558810466226" y="351.21875" />
+      <point x="269.6019828984224" y="351.21875" />
+      <point x="269.6019828984224" y="251.21875" />
+      <point x="162.58039085054415" y="251.21875" />
+      <point x="23.333333333333343" y="15.0" />
+    </edge>
+    <edge source="Console" target="handlers.JsonHandler">
+      <point x="30.58823529411768" y="-15.0" />
+      <point x="519.8631988571578" y="631.21875" />
+      <point x="663.1502477340039" y="631.21875" />
+      <point x="663.1502477340039" y="521.21875" />
+      <point x="667.6147045760343" y="521.21875" />
+      <point x="45.33333333333334" y="15.0" />
+    </edge>
+    <edge source="handlers.AuthHandler" target="models">
+      <point x="54.39999999999998" y="-15.0" />
+      <point x="513.0671204257853" y="281.21875" />
+      <point x="505.8531369376532" y="281.21875" />
+      <point x="505.8531369376532" y="161.21875" />
+      <point x="501.6155318489822" y="161.21875" />
+      <point x="22.73684210526318" y="15.0" />
+    </edge>
+    <edge source="handlers.BoatHandler" target="models">
+      <point x="59.5" y="-15.0" />
+      <point x="434.1671204257853" y="521.21875" />
+      <point x="543.781371242701" y="521.21875" />
+      <point x="543.781371242701" y="151.21875" />
+      <point x="509.1944792174032" y="151.21875" />
+      <point x="30.31578947368422" y="15.0" />
+    </edge>
+    <edge source="Console" target="models">
+      <point x="36.70588235294122" y="-15.0" />
+      <point x="525.9808459159815" y="641.21875" />
+      <point x="700.781371242701" y="641.21875" />
+      <point x="700.781371242701" y="121.21875" />
+      <point x="531.9313213226665" y="121.21875" />
+      <point x="53.0526315789474" y="15.0" />
+    </edge>
+    <edge source="handlers.BoatHandler" target="handlers.MemberHandler">
+      <point x="-42.5" y="-15.0" />
+      <point x="332.1671204257853" y="491.21875" />
+      <point x="308.5558810466226" y="491.21875" />
+      <point x="38.0" y="15.0" />
+    </edge>
+    <edge source="handlers.AuthHandler" target="view.View">
+      <point x="-54.39999999999998" y="-15.0" />
+      <point x="404.2671204257853" y="241.21875" />
+      <point x="169.24705751721083" y="241.21875" />
+      <point x="30.00000000000003" y="15.0" />
+    </edge>
+    <edge source="Main" target="view.View">
+      <point x="0.0" y="-15.0" />
+      <point x="58.38719266520741" y="736.21875" />
+      <point x="39.0" y="736.21875" />
+      <point x="39.0" y="241.21875" />
+      <point x="109.2470575172108" y="241.21875" />
+      <point x="-30.0" y="15.0" />
+    </edge>
+    <edge source="handlers.BoatHandler" target="handlers.AuthHandler">
+      <point x="25.5" y="-15.0" />
+      <point x="400.1671204257853" y="501.21875" />
+      <point x="467.2749635630402" y="501.21875" />
+      <point x="467.2749635630402" y="411.21875" />
+      <point x="447.333787092452" y="411.21875" />
+      <point x="-11.333333333333314" y="15.0" />
+    </edge>
+    <edge source="Console" target="handlers.DBHandler">
+      <point x="12.235294117647072" y="-15.0" />
+      <point x="501.5102576806873" y="601.21875" />
+      <point x="548.083787092452" y="601.21875" />
+      <point x="-30.0" y="15.0" />
+    </edge>
+    <edge source="Main" target="Console">
+      <point x="26.66666666666667" y="-15.0" />
+      <point x="85.0538593318741" y="736.21875" />
+      <point x="489.2749635630402" y="736.21875" />
+      <point x="0.0" y="15.0" />
+    </edge>
+    <edge source="Console" target="handlers.AuthHandler">
+      <point x="0.0" y="-15.0" />
+      <point x="489.2749635630402" y="401.21875" />
+      <point x="492.6671204257853" y="401.21875" />
+      <point x="34.0" y="15.0" />
+    </edge>
+    <edge source="Console" target="handlers.BoatHandler">
+      <point x="-12.235294117647072" y="-15.0" />
+      <point x="477.03966944539314" y="601.21875" />
+      <point x="340.6671204257853" y="601.21875" />
+      <point x="-34.0" y="15.0" />
+    </edge>
+    <edge source="handlers.SearchHandler" target="models">
+      <point x="0.0" y="-15.0" />
+      <point x="138.28431372549014" y="361.21875" />
+      <point x="293.28812145777704" y="361.21875" />
+      <point x="293.28812145777704" y="111.21875" />
+      <point x="448.5629002700348" y="111.21875" />
+      <point x="-30.31578947368422" y="15.0" />
+    </edge>
+    <edge source="Console" target="view.View">
+      <point x="-48.94117647058829" y="-15.0" />
+      <point x="440.3337870924519" y="661.21875" />
+      <point x="45.66666666666663" y="661.21875" />
+      <point x="45.66666666666663" y="251.21875" />
+      <point x="115.91372418387746" y="251.21875" />
+      <point x="-23.333333333333343" y="15.0" />
+    </edge>
+    <edge source="models" target="models">
+      <point x="-45.473684210526315" y="15.0" />
+      <point x="433.4050055331927" y="81.21875" />
+      <point x="356.878689743719" y="81.21875" />
+      <point x="356.878689743719" y="4.96875" />
+      <point x="-72.0" y="-11.25" />
+    </edge>
+    <edge source="handlers.MemberHandler" target="view.View">
+      <point x="-65.14285714285711" y="-15.0" />
+      <point x="205.41302390376546" y="351.21875" />
+      <point x="221.4205443803105" y="351.21875" />
+      <point x="221.4205443803105" y="271.21875" />
+      <point x="149.24705751721083" y="271.21875" />
+      <point x="10.000000000000028" y="15.0" />
+    </edge>
+    <edge source="Console" target="handlers.SearchHandler">
+      <point x="-36.70588235294122" y="-15.0" />
+      <point x="452.569081210099" y="641.21875" />
+      <point x="100.28431372549016" y="641.21875" />
+      <point x="-38.0" y="15.0" />
+    </edge>
+    <edge source="handlers.JsonHandler" target="models">
+      <point x="-34.0" y="-15.0" />
+      <point x="588.281371242701" y="411.21875" />
+      <point x="631.5654709185474" y="411.21875" />
+      <point x="631.5654709185474" y="141.21875" />
+      <point x="516.7734265858244" y="141.21875" />
+      <point x="37.89473684210532" y="15.0" />
+    </edge>
+    <edge source="handlers.DBHandler" target="handlers.JsonHandler">
+      <point x="0.0" y="-15.0" />
+      <point x="578.083787092452" y="521.21875" />
+      <point x="576.9480379093676" y="521.21875" />
+      <point x="-45.33333333333337" y="15.0" />
+    </edge>
+    <edge source="handlers.MemberHandler" target="handlers.AuthHandler">
+      <point x="43.428571428571445" y="-15.0" />
+      <point x="313.984452475194" y="401.21875" />
+      <point x="402.0004537591186" y="401.21875" />
+      <point x="-56.666666666666686" y="15.0" />
+    </edge>
+    <edge source="handlers.SearchHandler" target="handlers.MemberHandler">
+      <point x="30.399999999999977" y="-15.0" />
+      <point x="168.68431372549014" y="511.21875" />
+      <point x="207.22254771328926" y="511.21875" />
+      <point x="-63.333333333333314" y="15.0" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic Group" zoom="1.0" x="677.5" y="401.0" />
+  <SelectedNodes />
+  <Categories />
+  <SCOPE>All</SCOPE>
+  <VISIBILITY>private</VISIBILITY>
+</Diagram>
+
