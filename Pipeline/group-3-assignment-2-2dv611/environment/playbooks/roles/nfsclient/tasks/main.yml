@@ -1,0 +1,24 @@
+# Install NFS Client
+# Source: https://gitlab.lnu.se/1dv032/student/fl222ai/exam-3/-/blob/master/scripts/ansible/nfs.yaml
+---
+  - name: Install NFS common client
+    apt:
+        name: nfs-common
+        force_apt_get: yes
+        state: present
+
+  - name: Create directory for the NFS host's db/export directory
+    file:
+      path: "/db/export"
+      state: directory
+
+  - name: Mount the shared directory on the client
+    command: sudo mount {{ storage_ip }}:/db/export /db/export
+
+  - name: Create directory for the NFS host's app/export directory
+    file:
+      path: "/app/export"
+      state: directory
+      
+  - name: Mount the shared directory on the client
+    command: sudo mount {{ storage_ip }}:/app/export /app/export

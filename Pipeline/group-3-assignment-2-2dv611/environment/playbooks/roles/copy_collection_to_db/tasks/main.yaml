@@ -1,0 +1,36 @@
+---
+  - name: Ensures ~/ dir exists
+    file: path=/home/ubuntu/mongodb/backup state=directory
+    ignore_errors: yes
+
+  - name: Copy the collection from local host to host
+    become: true 
+    copy:
+      src: ./mongodb/backup/calc
+      dest: /home/ubuntu/mongodb/backup
+    ignore_errors: yes
+
+  - name: Get mongo pod name
+    shell: kubectl get pods --no-headers=true | grep calc-mongodb | cut -c 1-29
+    register: mongopod
+    ignore_errors: yes
+
+  - name: Drop old collection
+    shell: kubectl exec -it "{{ mongopod.stdout }}"  -- bash -c "mongo --eval \"db.histories.drop();\" calc"
+    ignore_errors: yes
+
+  - name: Copy collection backup from host to container
+    shell: "kubectl cp /home/ubuntu/mongodb/backup/calc/histories.bson {{ mongopod.stdout }}:mongodb/backup/calc/histories.bson"
+    ignore_errors: yes
+
+  - name: Restor Collection
+    shell: "kubectl exec -it {{ mongopod.stdout }} -- mongorestore ./mongodb/backup"
+    ignore_errors: yes
+
+  - name: Remove collection from container
+    shell: kubectl exec "{{ mongopod.stdout }}" -- sh -c 'rm -rf mongodb/backup/calc/histories.bson'
+    ignore_errors: yes
+
+  # - name: Remove the histories.bson file
+  #   shell: rm /home/ubuntu/mongodb/backup/calc/histories.bson
+  #   ignore_errors: yes

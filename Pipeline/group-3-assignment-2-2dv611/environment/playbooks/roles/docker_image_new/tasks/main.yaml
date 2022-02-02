@@ -1,0 +1,28 @@
+---
+  - name: 'Check variables'
+    debug:
+      msg:
+        - "Registry: {{ remote_registry }}"
+        - "Image: {{ remote_image }}"
+        - "Image tag: {{ image_tag }}"
+
+  - name: 'Login in to the the remote registry'
+    shell: echo {{ remote_registry_password }} | docker login -u {{ remote_registry_username }} {{ remote_registry }} --password-stdin
+    
+  - name: 'Pull the image from the remote registry'
+    shell: docker pull {{ remote_image }} || true
+
+  - name: 'Log out from the remote regisistry'
+    shell: docker logout {{ remote_registry }}
+    
+  - name: 'Tag the downloaded image {{ remote_image }} with the tag: {{ image }}:{{ image_tag }}'
+    shell: 'sudo docker tag {{ remote_image }} {{ registry }}/{{ image }}:{{ image_tag }}'
+
+  - name: 'Tag the downloaded image {{ remote_image }} with the tag: {{ image }}:latest'
+    shell: 'sudo docker tag {{ remote_image }} {{ registry }}/{{ image }}:latest'
+
+  - name: 'Push the {{ app }} image with all the tags to the registry: {{ registry }}'
+    shell: 'sudo docker push --all-tags {{ registry }}/{{ image }}'
+
+  - name: 'Remove the {{ app }} image and tags from the local instance'
+    shell: 'sudo docker rmi -f $(sudo docker images {{ registry }}/{{ image }} -q)'

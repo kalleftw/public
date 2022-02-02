@@ -1,0 +1,59 @@
+# Install Docker
+# Source: https://gitlab.lnu.se/fl222ai/group-4-assignment-2-2dv517/-/blob/main/configuration/ansible/roles/docker/tasks/main.yml
+---
+      - name: Install aptitude using apt
+        apt: name=aptitude state=latest update_cache=yes force_apt_get=yes
+    
+      - name: Install required system packages
+        apt: name={{ item }} state=latest update_cache=yes
+        loop: [ 'apt-transport-https', 'ca-certificates', 'curl', 'software-properties-common', 'jq',]
+
+      - name: Add Docker GPG apt Key
+        apt_key:
+          url: https://download.docker.com/linux/ubuntu/gpg
+          state: present
+    
+      - name: Add Docker Repository
+        apt_repository:
+          repo: deb https://download.docker.com/linux/ubuntu focal stable
+          state: present
+
+      - name: Update apt and install docker-ce
+        apt: update_cache=yes name=docker-ce state=latest  
+  
+      - name: Create deamon.json
+        copy:
+          dest: "/etc/docker/daemon.json"
+          content: |
+            {
+              "exec-opts": ["native.cgroupdriver=systemd"],
+              "log-driver": "json-file",
+              "log-opts": {
+                "max-size": "100m"
+              },
+              "storage-driver": "overlay2",
+              "insecure-registries": ["{{ registry_ip }}:5000"]
+            }
+
+      - name: Create docker.service.d
+        become: yes
+        file:
+         path: /etc/systemd/system/docker.service.d
+         state: directory       
+
+      - name: Install docker dependencies
+        apt:
+          name: python3-pip
+          state: present
+
+      - name: Start docker
+        service:
+          name: docker
+          state: started
+
+      - name: Install docker, kubernetes, & openshift module
+        pip:
+          name:
+            - docker
+            - kubernetes
+            - openshift

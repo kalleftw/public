@@ -1,0 +1,53 @@
+workflow:
+  rules:
+    - if: $GITLAB_USER_NAME =~ /^Fredrik/
+      variables:
+        OS_KEY_NAME: ${OS_KEY_NAME_FREDRIK}
+        OS_KEY_PAIR: ${OS_KEY_PAIR_FREDRIK}
+        OS_PASSWORD: ${OS_PASSWORD_FREDRIK}
+        OS_TENANT_ID: ${OS_TENANT_ID_FREDRIK}
+        OS_TENANT_NAME: ${OS_TENANT_NAME_FREDRIK}
+        OS_USERNAME: ${OS_USERNAME_FREDRIK}
+        ANSIBLE_KEY: ${ANSIBLE_KEY_FREDRIK}
+      when: always
+    - if: $GITLAB_USER_NAME =~ /^Joel/
+      variables:
+        OS_KEY_NAME: ${OS_KEY_NAME_JOEL}
+        OS_KEY_PAIR: ${OS_KEY_PAIR_JOEL}
+        OS_PASSWORD: ${OS_PASSWORD_JOEL}
+        OS_TENANT_ID: ${OS_TENANT_ID_JOEL}
+        OS_TENANT_NAME: ${OS_TENANT_NAME_JOEL}
+        OS_USERNAME: ${OS_USERNAME_JOEL}
+        ANSIBLE_KEY: ${ANSIBLE_KEY_JOEL}
+      when: always
+    - if: $GITLAB_USER_NAME =~ /^(?i)Karl/
+      variables:
+        OS_KEY_NAME: ${OS_KEY_NAME_KARL}
+        OS_KEY_PAIR: ${OS_KEY_PAIR_KARL}
+        OS_PASSWORD: ${OS_PASSWORD_KARL}
+        OS_TENANT_ID: ${OS_TENANT_ID_KARL}
+        OS_TENANT_NAME: ${OS_TENANT_NAME_KARL}
+        OS_USERNAME: ${OS_USERNAME_KARL}
+        ANSIBLE_KEY: ${ANSIBLE_KEY_KARL}
+      when: always
+    - if: $GITLAB_USER_NAME =~ /^Eric/
+      variables:
+        OS_KEY_NAME: ${OS_KEY_NAME_ERIC}
+        OS_KEY_PAIR: ${OS_KEY_PAIR_ERIC}
+        OS_PASSWORD: ${OS_PASSWORD_ERIC}
+        OS_TENANT_ID: ${OS_TENANT_ID_ERIC}
+        OS_TENANT_NAME: ${OS_TENANT_NAME_ERIC}
+        OS_USERNAME: ${OS_USERNAME_ERIC}
+        ANSIBLE_KEY: ${ANSIBLE_KEY_ERIC}
+      when: always
+    - if: $GITLAB_USER_NAME =~ /^Elias/
+      variables:
+        OS_KEY_NAME: ${OS_KEY_NAME_ELIAS}
+        OS_KEY_PAIR: ${OS_KEY_PAIR_ELIAS}
+        OS_PASSWORD: ${OS_PASSWORD_ELIAS}
+        OS_TENANT_ID: ${OS_TENANT_ID_ELIAS}
+        OS_TENANT_NAME: ${OS_TENANT_NAME_ELIAS}
+        OS_USERNAME: ${OS_USERNAME_ELIAS}
+        ANSIBLE_KEY: ${ANSIBLE_KEY_ELIAS}
+      when: always
+    - when: always

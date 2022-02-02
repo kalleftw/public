@@ -1,0 +1,124 @@
+Deploy-app-staging:
+  stage: Staging
+  image: willhallonline/ansible:2.10-ubuntu-20.04
+  needs: ["Build-environment", "Build-image", "Blue-cluster", "Green-cluster"]
+  variables:
+    IMAGE_TAG_COMMIT: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA
+    IMAGE_TAG_LATEST: $CI_REGISTRY_IMAGE:latest
+    COMMIT_TAG: $CI_COMMIT_SHORT_SHA
+  environment:
+    name: staging
+  before_script:
+  - 'command -v ssh-agent >/dev/null || ( apt-get update -y && apt-get install openssh-client -y )'
+  - eval $(ssh-agent -s)
+  - echo "$ANSIBLE_KEY" | tr -d '\r' | ssh-add -
+  - mkdir -p ~/.ssh
+  - chmod 700 ~/.ssh
+  script:
+  - BLUE_ENVIRONMENT=$( cat ${TF_ROOT}/environment/playbooks/blue_loadbalancer_description.txt )
+  - GREEN_ENVIRONMENT=$( cat ${TF_ROOT}/environment/playbooks/green_loadbalancer_description.txt )
+  - COLOR="blue"
+  - if [ "$BLUE_ENVIRONMENT" == "production" ]; then COLOR="green"; fi
+  - cat ${TF_ROOT}/environment/playbooks/inventory/blue_hosts
+  - cat ${TF_ROOT}/environment/playbooks/inventory/green_hosts
+  - cat ${TF_ROOT}/environment/playbooks/ansible.cfg
+  - chmod 755 ${TF_ROOT}/environment/playbooks
+  - cd ${TF_ROOT}/environment/playbooks
+  - ansible-playbook -i inventory deploy_app_new.yaml --e "instance_color=$COLOR ci_password=$CI_REGISTRY_PASSWORD ci_username=$CI_REGISTRY_USER ci_registry=$CI_REGISTRY ci_image=$IMAGE_TAG_COMMIT ci_commit=$COMMIT_TAG"
+  dependencies:
+    - Build-environment
+    - Build-image
+    - Blue-cluster
+    - Green-cluster
+  # when: manual
+  # only:
+  #   - main
+
+Smoke-test:
+  stage: Staging
+  image: curlimages/curl:7.80.0
+  needs: ["Node-modules", "Build-environment", "Deploy-app-staging"]
+  environment:
+    name: staging
+  script:
+    - STAGING_IP=$( cat ${TF_ROOT}/environment/playbooks/staging_ip.txt )
+    - echo "$STAGING_IP"
+    - curl -v -f --max-time 3 --retry 20 --retry-delay 3 -o /dev/null "${STAGING_IP}"
+    # - PRODUCTION_IP=$( cat ${TF_ROOT}/environment/playbooks/production_ip.txt )
+    # - echo "$PRODUCTION_IP"
+    # - curl -v -f --max-time 3 --retry 20 --retry-delay 3 -o /dev/null "${PRODUCTION_IP}"
+  dependencies:
+    - Node-modules
+    - Build-environment
+    - Deploy-app-staging
+
+Integration-test:
+  stage: Staging
+  image: node:14-alpine
+  needs: ["Node-modules", "Build-environment", "Deploy-app-staging", "Smoke-test"]
+  before_script:
+  - BLUE_BASTION_PUBLIC_IP=$( cat ${TF_ROOT}/environment/playbooks/blue_bastion_public_ip.txt )
+  - echo "${BLUE_BASTION_PUBLIC_IP}"
+  - BLUE_MASTER_PRIVATE_IP=$( cat ${TF_ROOT}/environment/playbooks/blue_master_private_ip.txt )
+  - echo "${BLUE_MASTER_PRIVATE_IP}"
+  - GREEN_BASTION_PUBLIC_IP=$( cat ${TF_ROOT}/environment/playbooks/green_bastion_public_ip.txt )
+  - echo "${GREEN_BASTION_PUBLIC_IP}"
+  - GREEN_MASTER_PRIVATE_IP=$( cat ${TF_ROOT}/environment/playbooks/green_master_private_ip.txt )
+  - echo "${GREEN_MASTER_PRIVATE_IP}"
+  - BASTION_PUBLIC_IP="$BLUE_BASTION_PUBLIC_IP"
+  - MASTER_PRIVATE_IP="$BLUE_MASTER_PRIVATE_IP"
+  - BLUE_ENVIRONMENT=$( cat ${TF_ROOT}/environment/playbooks/blue_loadbalancer_description.txt )
+  - GREEN_ENVIRONMENT=$( cat ${TF_ROOT}/environment/playbooks/green_loadbalancer_description.txt )
+  - COLOR="blue"
+  - if [ "$BLUE_ENVIRONMENT" == "production" ]; then BASTION_PUBLIC_IP="$GREEN_BASTION_PUBLIC_IP"; MASTER_PRIVATE_IP="$GREEN_MASTER_PRIVATE_IP"; fi
+  - echo "${BASTION_PUBLIC_IP}"
+  - echo "${MASTER_PRIVATE_IP}"
+  - 'command -v ssh-agent >/dev/null || ( apk --update add openssh-client )'
+  - mkdir -p ~/.ssh
+  - chmod 700 ~/.ssh
+  - echo "$ANSIBLE_KEY" > ~/.ssh/key
+  - chmod 600 ~/.ssh/key
+  - touch ~/.ssh/known_hosts
+  - ssh-keyscan ${BASTION_PUBLIC_IP} >> ~/.ssh/known_hosts
+  - eval `ssh-agent`
+  - sleep 2
+  - ssh-add -k ~/.ssh/key
+  - scp ~/.ssh/key ubuntu@${BASTION_PUBLIC_IP}:.ssh
+  - ssh -tt -v ubuntu@${BASTION_PUBLIC_IP} "chmod 600 ~/.ssh/key; ssh-keyscan ${MASTER_PRIVATE_IP} >> ~/.ssh/known_hosts"
+  - ssh -v -o StrictHostKeyChecking=no -o ProxyCommand="ssh -W %h:%p -q -i ~/.ssh/key ubuntu@${BASTION_PUBLIC_IP}" -t -L 127.0.0.1:27017:127.0.0.1:27017 ubuntu@${MASTER_PRIVATE_IP} -- kubectl port-forward svc/calc-mongodb-svc 27017:27017 &
+  - sleep 10
+  variables:
+      MONGO_URL: 'mongodb://127.0.0.1:27017/calc'
+  environment:
+    name: staging
+  script:
+   - npm --prefix ./src run mongo-test
+  dependencies:
+    - Node-modules
+    - Build-environment
+    - Deploy-app-staging
+    - Smoke-test
+
+Acceptance-test:
+  stage: Staging
+  image: buildkite/puppeteer:latest
+  services:
+    - mongo:latest
+  variables:
+    MONGO_URL: 'mongodb://mongo/calc'
+  needs: ["Node-modules", "Build-environment", "Deploy-app-staging", "Integration-test"]
+  environment:
+    name: staging
+  script:
+    - STAGING_IP=$( cat ${TF_ROOT}/environment/playbooks/staging_ip.txt )
+    - echo "$STAGING_IP"
+    - npm --prefix ./src --homeurl="${STAGING_IP}" run acceptance-test
+    # - PRODUCTION_IP=$( cat ${TF_ROOT}/environment/playbooks/production_ip.txt )
+    # - echo "$PRODUCTION_IP"
+    # - npm --prefix ./src --homeurl="${PRODUCTION_IP}" run acceptance-test
+  dependencies:
+    - Node-modules
+    - Build-environment
+    - Deploy-app-staging
+    - Integration-test
+

@@ -1,0 +1,34 @@
+# Main config playbook. Creates a K8 cluster on target instances
+---
+- hosts: "{{ instance_color }}-all"
+  name: Ping all instances (SSH ping)
+  strategy: mitogen_free
+  become: true
+  roles:
+    - ping
+
+- hosts: "{{ instance_color }}-master"
+  name: Deploy app to the Kubernetes cluster
+  become: true
+  roles:
+    - docker_image_new
+    - docker_image_cluster_new
+  vars:
+    - host_color: "{{ instance_color }}"
+    - remote_registry_password: '{{ ci_password }}'
+    - remote_registry_username: '{{ ci_username }}'
+    - remote_registry: '{{ ci_registry }}'
+    - remote_image: '{{ ci_image }}'
+    - home_path: "/home/ubuntu"
+    - db_path: "/db/export"
+    - registry_ip: "{{ hostvars[host_color + '-storage']['ansible_default_ipv4']['address'] }}"
+    - registry: '{{ registry_ip }}:5000'
+    - storage_ip: "{{ hostvars[host_color + '-storage']['ansible_default_ipv4']['address'] }}"
+    - app: 'calc'
+    - image: 'calc'
+    - image_tag: '{{ ci_commit }}'
+    - container_port: 3000
+    - db_port: 27017
+    - exposed_port: 80
+    - node_port: 31790
+

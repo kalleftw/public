@@ -1,0 +1,12 @@
+# Install kubectl
+# Source: https://gitlab.lnu.se/1dv032/student/fl222ai/exam-3/-/blob/master/scripts/ansible/workers.yaml
+---
+    - name: join cluster
+      vars:
+        - master_color: '{{ node_color }}'
+      shell: "{{ hostvars[master_color + '-master'].join_command }} >> node_joined.txt"
+      args:
+        chdir: $HOME
+        creates: node_joined.txt
+      async: 1000
+      poll: 0

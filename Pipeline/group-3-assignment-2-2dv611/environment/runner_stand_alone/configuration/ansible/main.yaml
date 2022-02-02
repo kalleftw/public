@@ -1,0 +1,10 @@
+---
+- hosts: runner
+  become: true
+  roles:
+    - ping
+    - docker
+    - runner
+
+
+

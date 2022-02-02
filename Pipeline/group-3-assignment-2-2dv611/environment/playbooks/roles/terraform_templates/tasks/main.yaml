@@ -1,0 +1,17 @@
+---
+  - name: Create Terraform main.tf from template for {{ color }}_instances
+    template: 
+      src: '{{ playbook_dir }}/templates/terraform_instances_main.j2'
+      dest: '{{ playbook_dir }}/../{{ color }}_instances/provisioning/main.tf'
+    vars:
+      color: '{{ color }}'
+
+  - name: Create Terraform out.tf from template for {{ color }}_instances
+    template: 
+      src: '{{ playbook_dir }}/templates/terraform_instances_output.j2'
+      dest: '{{ playbook_dir }}/../{{ color }}_instances/provisioning/output.tf'
+    vars:
+      color: '{{ color }}'
+
+
+  

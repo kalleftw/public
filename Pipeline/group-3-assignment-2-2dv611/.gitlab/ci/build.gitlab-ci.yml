@@ -1,0 +1,219 @@
+Build-image:
+  stage: Build
+  image: docker:20.10.10
+  needs: ['Node-modules', 'Test-app']
+  services:
+    - docker:20.10.10-dind
+  variables:
+    IMAGE_TAG_COMMIT: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA
+    IMAGE_TAG_LATEST: $CI_REGISTRY_IMAGE:latest
+  script:
+    - cd ./src/
+    - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER $CI_REGISTRY --password-stdin
+    - docker pull $IMAGE_TAG_LATEST || true
+    - docker build --cache-from $IMAGE_TAG_LATEST -t $IMAGE_TAG_COMMIT -t $IMAGE_TAG_LATEST .
+    - docker push $IMAGE_TAG_COMMIT
+    - docker push $IMAGE_TAG_LATEST
+  dependencies:
+    - Node-modules
+    - Test-app
+
+Build-environment:
+  stage: Build
+  image: registry.gitlab.com/gitlab-org/terraform-images/stable:latest
+  needs: ['Terraform-plan', 'Test-app']
+  before_script:
+    - cd ${TF_ROOT}
+  script:
+    - export TF_VAR_username=${OS_USERNAME}
+    - export TF_VAR_password=${OS_PASSWORD}
+    - export TF_VAR_external_gateway=${OS_EXTERNAL_GATEWAY}
+    - export TF_VAR_tenant_name=${OS_TENANT_NAME}
+    - export TF_VAR_tenant_id=${OS_TENANT_ID}
+    - export TF_VAR_key_pair=${OS_KEY_PAIR}
+    - export TF_VAR_key_name=${OS_KEY_NAME}
+    - export TF_VAR_gitlab_token=${RUNNER_TOKEN}
+    - gitlab-terraform apply -lock=false
+    - mkdir -p ${TF_ROOT}/environment/playbooks/inventory
+    - gitlab-terraform output -raw ansible_blue_inventory > ${TF_ROOT}/environment/playbooks/inventory/blue_hosts
+    - cat ${TF_ROOT}/environment/playbooks/inventory/blue_hosts
+    - gitlab-terraform output -raw ansible_green_inventory > ${TF_ROOT}/environment/playbooks/inventory/green_hosts
+    - cat ${TF_ROOT}/environment/playbooks/inventory/green_hosts
+    - gitlab-terraform output -raw runner_ansible_inventory > ${TF_ROOT}/environment/playbooks/inventory/runner_hosts
+    - cat ${TF_ROOT}/environment/playbooks/inventory/runner_hosts
+    - gitlab-terraform output -raw ansible_cfg > ${TF_ROOT}/environment/playbooks/ansible.cfg
+    - cat ${TF_ROOT}/environment/playbooks/ansible.cfg
+    - gitlab-terraform output -raw production_public_ip > ${TF_ROOT}/environment/playbooks/production_ip.txt
+    - cat ${TF_ROOT}/environment/playbooks/production_ip.txt
+    - gitlab-terraform output -raw production_public_ip_id > ${TF_ROOT}/environment/playbooks/production_ip_id.txt
+    - cat ${TF_ROOT}/environment/playbooks/production_ip_id.txt
+    - gitlab-terraform output -raw staging_public_ip > ${TF_ROOT}/environment/playbooks/staging_ip.txt
+    - cat ${TF_ROOT}/environment/playbooks/staging_ip.txt
+    - gitlab-terraform output -raw staging_public_ip_id > ${TF_ROOT}/environment/playbooks/staging_ip_id.txt
+    - cat ${TF_ROOT}/environment/playbooks/staging_ip_id.txt
+    - gitlab-terraform output -raw blue_loadbalancer_description > ${TF_ROOT}/environment/playbooks/blue_loadbalancer_description.txt
+    - cat ${TF_ROOT}/environment/playbooks/blue_loadbalancer_description.txt
+    - gitlab-terraform output -raw blue_loadbalancer_port_id > ${TF_ROOT}/environment/playbooks/blue_loadbalancer_port_id.txt
+    - cat ${TF_ROOT}/environment/playbooks/blue_loadbalancer_port_id.txt
+    - gitlab-terraform output -raw green_loadbalancer_description > ${TF_ROOT}/environment/playbooks/green_loadbalancer_description.txt
+    - cat ${TF_ROOT}/environment/playbooks/green_loadbalancer_description.txt
+    - gitlab-terraform output -raw green_loadbalancer_port_id > ${TF_ROOT}/environment/playbooks/green_loadbalancer_port_id.txt
+    - cat ${TF_ROOT}/environment/playbooks/green_loadbalancer_port_id.txt
+    - gitlab-terraform output -raw blue_bastion_public_ip > ${TF_ROOT}/environment/playbooks/blue_bastion_public_ip.txt
+    - cat ${TF_ROOT}/environment/playbooks/blue_bastion_public_ip.txt
+    - gitlab-terraform output -raw blue_master_private_ip > ${TF_ROOT}/environment/playbooks/blue_master_private_ip.txt
+    - cat ${TF_ROOT}/environment/playbooks/blue_master_private_ip.txt
+    - gitlab-terraform output -raw green_bastion_public_ip > ${TF_ROOT}/environment/playbooks/green_bastion_public_ip.txt
+    - cat ${TF_ROOT}/environment/playbooks/green_bastion_public_ip.txt
+    - gitlab-terraform output -raw green_master_private_ip > ${TF_ROOT}/environment/playbooks/green_master_private_ip.txt
+    - cat ${TF_ROOT}/environment/playbooks/green_master_private_ip.txt
+    - PRODUCTION_IP=$( cat ${TF_ROOT}/environment/playbooks/production_ip.txt )
+    - STAGING_IP=$( cat ${TF_ROOT}/environment/playbooks/staging_ip.txt )
+    - if [ $(curl -LI --max-time 3 --retry 3 --retry-delay 3 "${PRODUCTION_IP}" -o /dev/null -w '%{http_code}\n' -s) == "200" ]; then PRODUCTION=DEPLOYED; else PRODUCTION=NOT_DEPLOYED; fi
+    - if [ $(curl -LI --max-time 3 --retry 3 --retry-delay 3 "${STAGING_IP}" -o /dev/null -w '%{http_code}\n' -s) == "200" ]; then STAGING=DEPLOYED; else STAGING=NOT_DEPLOYED; fi
+    - echo "Application status on PRODUCTION loadbalancer - ${PRODUCTION}"
+    - echo "Application status on STAGING loadbalancer - ${STAGING}"
+    - echo "${PRODUCTION}" > ${TF_ROOT}/environment/playbooks/production_status.txt
+    - echo "${STAGING}" > ${TF_ROOT}/environment/playbooks/staging_status.txt
+    - cat ${TF_ROOT}/environment/playbooks/production_status.txt
+    - cat ${TF_ROOT}/environment/playbooks/staging_status.txt
+  cache:
+    - key: user${GITLAB_USER_ID}
+      paths:
+        - ${TF_ROOT}/.terraform
+  artifacts:
+    name: ansible-hosts-$CI_COMMIT_REF_SLUG
+    paths:
+      - ${TF_ROOT}/environment/playbooks/inventory/blue_hosts
+      - ${TF_ROOT}/environment/playbooks/inventory/green_hosts
+      - ${TF_ROOT}/environment/playbooks/inventory/runner_hosts
+      - ${TF_ROOT}/environment/playbooks/ansible.cfg
+      - ${TF_ROOT}/environment/playbooks/production_ip.txt
+      - ${TF_ROOT}/environment/playbooks/production_ip_id.txt
+      - ${TF_ROOT}/environment/playbooks/staging_ip.txt
+      - ${TF_ROOT}/environment/playbooks/staging_ip_id.txt
+      - ${TF_ROOT}/environment/playbooks/blue_loadbalancer_description.txt
+      - ${TF_ROOT}/environment/playbooks/blue_loadbalancer_port_id.txt
+      - ${TF_ROOT}/environment/playbooks/green_loadbalancer_description.txt
+      - ${TF_ROOT}/environment/playbooks/green_loadbalancer_port_id.txt
+      - ${TF_ROOT}/environment/playbooks/blue_bastion_public_ip.txt
+      - ${TF_ROOT}/environment/playbooks/blue_master_private_ip.txt
+      - ${TF_ROOT}/environment/playbooks/green_bastion_public_ip.txt
+      - ${TF_ROOT}/environment/playbooks/green_master_private_ip.txt
+      - ${TF_ROOT}/environment/playbooks/production_status.txt
+      - ${TF_ROOT}/environment/playbooks/staging_status.txt
+  dependencies:
+    - Terraform-plan
+
+# Loadbalancer-ip:
+#   stage: Build
+#   image: ubuntu:20.04
+#   needs: ['Build-environment']
+#   before_script:
+#     - cd ${TF_ROOT}/environment/
+#     - apt-get update
+#     - apt-get upgrade -y
+#     - apt-get install -y jq
+#     - apt install curl -y
+#     - apt-get install -y python3-pip
+#     - pip install python-openstackclient
+#     - pip install python-neutronclient
+#   script:
+#     - export OS_USERNAME=${OS_USERNAME}
+#     - export OS_PASSWORD=${OS_PASSWORD}
+#     - export OS_TENANT_NAME=${OS_TENANT_NAME}
+#     - export OS_AUTH_URL=https://cscloud.lnu.se:5000/v3
+#     - export OS_TENANT_ID=${OS_TENANT_ID}
+#     - export OS_REGION_NAME=RegionOne
+#     - export OS_USER_DOMAIN_NAME=default
+#     - openstack server list
+#     - chmod +x ip.sh
+#     - ./ip.sh ${TF_ROOT}
+#     - PRODUCTION_IP=$( cat ${TF_ROOT}/environment/playbooks/production_ip.txt )
+#     - STAGING_IP=$( cat ${TF_ROOT}/environment/playbooks/staging_ip.txt )
+#     - if [ $(curl -LI --max-time 3 --retry 3 --retry-delay 3 "${PRODUCTION_IP}" -o /dev/null -w '%{http_code}\n' -s) == "200" ]; then PRODUCTION=DEPLOYED; else PRODUCTION=NOT_DEPLOYED; fi
+#     - if [ $(curl -LI --max-time 3 --retry 3 --retry-delay 3 "${STAGING_IP}" -o /dev/null -w '%{http_code}\n' -s) == "200" ]; then STAGING=DEPLOYED; else STAGING=NOT_DEPLOYED; fi
+#     - echo "Application status on PRODUCTION loadbalancer - ${PRODUCTION}"
+#     - echo "Application status on STAGING loadbalancer - ${STAGING}"
+#   artifacts:
+#     name: loadbalancer-ip-$CI_COMMIT_REF_SLUG
+#     paths:
+#       - ${TF_ROOT}/environment/playbooks/production_ip.txt
+#       - ${TF_ROOT}/environment/playbooks/staging_ip.txt
+
+Blue-cluster:
+  stage: Build
+  image: willhallonline/ansible:2.10-ubuntu-20.04
+  needs: ['Build-environment']
+  variables:
+    IMAGE_TAG_COMMIT: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA
+    IMAGE_TAG_LATEST: $CI_REGISTRY_IMAGE:latest
+    COMMIT_TAG: $CI_COMMIT_SHORT_SHA
+  before_script:
+    - 'command -v ssh-agent >/dev/null || ( apt-get update -y && apt-get install openssh-client -y )'
+    - eval $(ssh-agent -s)
+    - echo "$ANSIBLE_KEY" | tr -d '\r' | ssh-add -
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+  script:
+    - ENVIRONMENT=$( cat ${TF_ROOT}/environment/playbooks/blue_loadbalancer_description.txt )
+    - PROD_STATUS=$( cat ${TF_ROOT}/environment/playbooks/production_status.txt )
+    - STAG_STATUS=$( cat ${TF_ROOT}/environment/playbooks/staging_status.txt )
+    - echo "$ENVIRONMENT"
+    - echo "$PROD_STATUS"
+    - if [ "$ENVIRONMENT" == "production" ] && [ "$PROD_STATUS" == "DEPLOYED" ]; then exit 0; fi
+    - cat ${TF_ROOT}/environment/playbooks/inventory/blue_hosts
+    - cat ${TF_ROOT}/environment/playbooks/ansible.cfg
+    - chmod 755 ${TF_ROOT}/environment/playbooks
+    - cd ${TF_ROOT}/environment/playbooks
+    - ansible-playbook -i inventory cluster.yaml --e "instance_color=blue cidr=10.244.0.0/16"
+
+Green-cluster:
+  stage: Build
+  image: willhallonline/ansible:2.10-ubuntu-20.04
+  needs: ['Build-environment']
+  variables:
+    IMAGE_TAG_COMMIT: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA
+    IMAGE_TAG_LATEST: $CI_REGISTRY_IMAGE:latest
+    COMMIT_TAG: $CI_COMMIT_SHORT_SHA
+  before_script:
+    - 'command -v ssh-agent >/dev/null || ( apt-get update -y && apt-get install openssh-client -y )'
+    - eval $(ssh-agent -s)
+    - echo "$ANSIBLE_KEY" | tr -d '\r' | ssh-add -
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+  script:
+    - ENVIRONMENT=$( cat ${TF_ROOT}/environment/playbooks/green_loadbalancer_description.txt )
+    - PROD_STATUS=$( cat ${TF_ROOT}/environment/playbooks/production_status.txt )
+    - STAG_STATUS=$( cat ${TF_ROOT}/environment/playbooks/staging_status.txt )
+    - echo "$ENVIRONMENT"
+    - echo "$PROD_STATUS"
+    - if [ "$ENVIRONMENT" == "production" ] && [ "$PROD_STATUS" == "DEPLOYED" ]; then exit 0; fi
+    - cat ${TF_ROOT}/environment/playbooks/inventory/green_hosts
+    - cat ${TF_ROOT}/environment/playbooks/ansible.cfg
+    - chmod 755 ${TF_ROOT}/environment/playbooks
+    - cd ${TF_ROOT}/environment/playbooks
+    - ansible-playbook -i inventory cluster.yaml --e "instance_color=green cidr=10.245.0.0/16"
+
+Configure-runner:
+  stage: Build
+  image: willhallonline/ansible:2.10-ubuntu-20.04
+  needs: ['Build-environment']
+  before_script:
+    - 'command -v ssh-agent >/dev/null || ( apt-get update -y && apt-get install openssh-client -y )'
+    - eval $(ssh-agent -s)
+    - echo "$ANSIBLE_KEY" | tr -d '\r' | ssh-add -
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+  script:
+    - cat ${TF_ROOT}/environment/playbooks/inventory/runner_hosts
+    - cat ${TF_ROOT}/environment/playbooks/ansible.cfg
+    - chmod 755 ${TF_ROOT}/environment/playbooks
+    - cd ${TF_ROOT}/environment/playbooks
+    - ansible-playbook -i inventory runner.yaml --e "gitlab_runner_token=$RUNNER_TOKEN gitlab_runner_name=$OS_USERNAME"
+  dependencies:
+    - Build-environment
+  when: manual
+  only:
+    - main
+

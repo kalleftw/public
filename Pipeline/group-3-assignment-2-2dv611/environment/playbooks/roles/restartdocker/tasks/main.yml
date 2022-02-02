@@ -1,0 +1,8 @@
+# Install kubectl
+# Source: https://gitlab.lnu.se/1dv032/student/fl222ai/exam-3/-/blob/master/scripts/ansible/registry.yaml
+---
+  - name: Restart Docker
+    command: service docker restart
+
+  - name: Sleep 20 seconds
+    command: sleep 20

@@ -1,0 +1,5 @@
+.npm
+node_modules/
+out/
+packagelock.json
+mongo-data/

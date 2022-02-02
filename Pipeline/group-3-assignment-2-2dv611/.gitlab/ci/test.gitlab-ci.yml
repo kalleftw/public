@@ -1,0 +1,18 @@
+Test-app:
+  stage: Test
+  image: node:14-alpine
+  services:
+    - mongo:latest
+  variables:
+    MONGO_URL: 'mongodb://mongo/calc'
+  needs: ["Node-modules"]
+  script:
+    - npm --prefix ./src run test
+    #- npm --prefix ./src run mongo-test
+  dependencies:
+    - Node-modules
+  artifacts:
+    when: always
+    reports:
+      junit:
+        - ./src/out/test-results.xml

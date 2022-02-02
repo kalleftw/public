@@ -1,0 +1,29 @@
+---
+- hosts: "{{ production_color }}-all"
+  name: "Ping all {{ production_color }} instances (SSH ping)"
+  strategy: mitogen_free
+  become: true
+  roles:
+    - ping
+
+- hosts: "{{ production_color }}-master"
+  name: Copy the database collection from the production environment
+  become: true
+  roles:
+    - copy_collection_from_db
+
+- hosts: "{{ staging_color }}-all"
+  name: "Ping all {{ staging_color }} instances (SSH ping)"
+  strategy: mitogen_free
+  become: true
+  roles:
+    - ping
+
+- hosts: "{{ staging_color }}-master"
+  name: Copy the database collection from the production environment
+  become: true
+  roles:
+    - copy_collection_to_db
+
+
+

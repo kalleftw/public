@@ -1,0 +1,115 @@
+Destroy-environment:
+  stage: Destroy
+  image: registry.gitlab.com/gitlab-org/terraform-images/stable:latest
+  needs: ["Terraform-plan", "Build-environment", "Terraform-files"]
+  environment:
+    name: staging
+  before_script:
+    - cd ${TF_ROOT}
+  script:
+    - export TF_VAR_username=${OS_USERNAME}
+    - export TF_VAR_password=${OS_PASSWORD}
+    - export TF_VAR_external_gateway=${OS_EXTERNAL_GATEWAY}
+    - export TF_VAR_tenant_name=${OS_TENANT_NAME}
+    - export TF_VAR_tenant_id=${OS_TENANT_ID}
+    - export TF_VAR_key_pair=${OS_KEY_PAIR}
+    - export TF_VAR_key_name=${OS_KEY_NAME}
+    - export TF_VAR_gitlab_token=${RUNNER_TOKEN}
+    - gitlab-terraform destroy -lock=false # -target "module.blue_instances" -lock=false
+  cache:
+    key: user${GITLAB_USER_ID}
+    paths:
+      - ${TF_ROOT}/.terraform
+  dependencies:
+    - Terraform-files
+    - Terraform-plan
+  when: manual
+  only:
+    - main
+
+Destroy-blue-instances:
+  stage: Destroy
+  image: registry.gitlab.com/gitlab-org/terraform-images/stable:latest
+  needs: ["Terraform-plan", "Build-environment", "Terraform-files"]
+  environment:
+    name: staging
+  before_script:
+    - cd ${TF_ROOT}
+  script:
+    - export TF_VAR_username=${OS_USERNAME}
+    - export TF_VAR_password=${OS_PASSWORD}
+    - export TF_VAR_external_gateway=${OS_EXTERNAL_GATEWAY}
+    - export TF_VAR_tenant_name=${OS_TENANT_NAME}
+    - export TF_VAR_tenant_id=${OS_TENANT_ID}
+    - export TF_VAR_key_pair=${OS_KEY_PAIR}
+    - export TF_VAR_key_name=${OS_KEY_NAME}
+    - export TF_VAR_gitlab_token=${RUNNER_TOKEN}
+    - gitlab-terraform destroy -target "module.blue_instances" -lock=false
+  cache:
+    key: user${GITLAB_USER_ID}
+    paths:
+      - ${TF_ROOT}/.terraform
+  dependencies:
+    - Terraform-files
+    - Terraform-plan
+  when: manual
+  only:
+    - main
+
+Destroy-green-instances:
+  stage: Destroy
+  image: registry.gitlab.com/gitlab-org/terraform-images/stable:latest
+  needs: ["Terraform-plan", "Build-environment", "Terraform-files"]
+  environment:
+    name: staging
+  before_script:
+    - cd ${TF_ROOT}
+  script:
+    - export TF_VAR_username=${OS_USERNAME}
+    - export TF_VAR_password=${OS_PASSWORD}
+    - export TF_VAR_external_gateway=${OS_EXTERNAL_GATEWAY}
+    - export TF_VAR_tenant_name=${OS_TENANT_NAME}
+    - export TF_VAR_tenant_id=${OS_TENANT_ID}
+    - export TF_VAR_key_pair=${OS_KEY_PAIR}
+    - export TF_VAR_key_name=${OS_KEY_NAME}
+    - export TF_VAR_gitlab_token=${RUNNER_TOKEN}
+    - gitlab-terraform destroy -target "module.green_instances" -lock=false
+  cache:
+    key: user${GITLAB_USER_ID}
+    paths:
+      - ${TF_ROOT}/.terraform
+  dependencies:
+    - Terraform-files
+    - Terraform-plan
+  when: manual
+  only:
+    - main
+
+Destroy-runner:
+  stage: Destroy
+  image: registry.gitlab.com/gitlab-org/terraform-images/stable:latest
+  needs: ["Terraform-plan", "Build-environment", "Terraform-files"]
+  environment:
+    name: staging
+  before_script:
+    - cd ${TF_ROOT}
+  script:
+    - export TF_VAR_username=${OS_USERNAME}
+    - export TF_VAR_password=${OS_PASSWORD}
+    - export TF_VAR_external_gateway=${OS_EXTERNAL_GATEWAY}
+    - export TF_VAR_tenant_name=${OS_TENANT_NAME}
+    - export TF_VAR_tenant_id=${OS_TENANT_ID}
+    - export TF_VAR_key_pair=${OS_KEY_PAIR}
+    - export TF_VAR_key_name=${OS_KEY_NAME}
+    - export TF_VAR_gitlab_token=${RUNNER_TOKEN}
+    - gitlab-terraform destroy -target "module.runner" -lock=false
+  cache:
+    key: user${GITLAB_USER_ID}
+    paths:
+      - ${TF_ROOT}/.terraform
+  dependencies:
+    - Terraform-files
+    - Terraform-plan
+  when: manual
+  only:
+    - main

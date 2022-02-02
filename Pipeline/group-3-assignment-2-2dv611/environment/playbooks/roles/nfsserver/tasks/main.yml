@@ -1,0 +1,45 @@
+# Install NFS Server
+# Source: https://gitlab.lnu.se/1dv032/student/fl222ai/exam-3/-/blob/master/scripts/ansible/nfs.yaml
+---
+  - name: Install NFS Server on storage instance
+    apt:
+        name: nfs-kernel-server
+        state: present
+  - name: Create an db/export directory
+    file:
+      path: "/db/export"
+      state: directory
+  - name: Change ownership, group and permissions of the export directory
+    file:
+      path: "/db/export"
+      owner: nobody
+      group: nogroup
+      mode: '1777'
+  - name: Allow access to all clients on network 
+    lineinfile:
+      path: "/etc/exports"
+      line: /db/export  *(rw,no_root_squash,no_subtree_check)
+      insertafter: '/srv/nfs4/homes'
+
+  - name: Create an app/export directory
+    file:
+      path: "/app/export"
+      state: directory
+  - name: Change ownership, group and permissions of the export directory
+    file:
+      path: "/app/export"
+      owner: nobody
+      group: nogroup
+      mode: '1777'
+  - name: Allow access to all clients on network 
+    lineinfile:
+      path: "/etc/exports"
+      line: /app/export  *(rw,no_root_squash,no_subtree_check)
+      insertafter: '/srv/nfs4/homes'
+  #general
+  - name: Export the shared directories
+    command: sudo exportfs -a
+  - name: Restart the NFS Kernel server
+    command: sudo systemctl restart nfs-kernel-server
+  - name: Open firewall for the client (s)
+    command: sudo ufw allow from 192.168.0.0/24 to any port nfs

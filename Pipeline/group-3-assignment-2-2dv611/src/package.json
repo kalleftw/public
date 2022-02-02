@@ -1,0 +1,41 @@
+{
+  "name": "calculator",
+  "version": "1.0.0",
+  "description": "Calculator",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/azure-pipelines-samples/node.js"
+  },
+  "main": "index.js",
+  "scripts": {
+    "start": "node server.js",
+    "build": "exit 0",
+    "test": "nyc --reporter=cobertura --reporter=html --reporter=text mocha --timeout 1000 --reporter mocha-multi-reporters --reporter-options configFile=test/config.json --exit",
+    "acceptance-test": "mocha --exit --timeout 12000 test/acceptance/acceptance.js",
+    "mongo-test": "mocha --exit --timeout 12000 test/mongoose/mongoose.js"
+  },
+  "keywords": [
+    "azure",
+    "pipelines",
+    "devops",
+    "vsts",
+    "ci",
+    "cd"
+  ],
+  "author": "Edward Thomson <ethomson@microsoft.com>",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.16.4",
+    "moment": "^2.29.1",
+    "mongoose": "^6.1.0"
+  },
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "mocha": "^5.2.0",
+    "mocha-junit-reporter": "^1.18.0",
+    "mocha-multi-reporters": "^1.1.7",
+    "nyc": "^13.3.0",
+    "puppeteer": "^12.0.1",
+    "supertest": "^3.4.2"
+  }
+}

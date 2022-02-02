@@ -1,0 +1,110 @@
+Deploy:
+  stage: Production
+  image: ubuntu:20.04
+  needs: ["Build-environment", "Build-image", "Deploy-app-staging", "Acceptance-test"]
+  environment:
+    name: production
+  before_script:
+    - cd ${TF_ROOT}/environment/
+    - apt-get update
+    - apt-get upgrade -y
+    - apt-get install -y jq
+    - apt install curl -y
+    - apt-get install -y python3-pip
+    - pip install python-openstackclient
+    - pip install python-neutronclient
+    - export OS_USERNAME=${OS_USERNAME}
+    - export OS_PASSWORD=${OS_PASSWORD}
+    - export OS_TENANT_NAME=${OS_TENANT_NAME}
+    - export OS_AUTH_URL=https://cscloud.lnu.se:5000/v3
+    - export OS_TENANT_ID=${OS_TENANT_ID}
+    - export OS_REGION_NAME=RegionOne
+    - export OS_USER_DOMAIN_NAME=default
+    - BLUE_ENVIRONMENT=$( cat ${TF_ROOT}/environment/playbooks/blue_loadbalancer_description.txt )
+    - GREEN_ENVIRONMENT=$( cat ${TF_ROOT}/environment/playbooks/green_loadbalancer_description.txt )
+    - BLUE_LB_PORT_ID=$( cat ${TF_ROOT}/environment/playbooks/blue_loadbalancer_port_id.txt )
+    - GREEN_LB_PORT_ID=$( cat ${TF_ROOT}/environment/playbooks/green_loadbalancer_port_id.txt )
+    - PRODUCTION_IP_ID=$( cat ${TF_ROOT}/environment/playbooks/production_ip_id.txt )
+    - STAGING_IP_ID=$( cat ${TF_ROOT}/environment/playbooks/staging_ip_id.txt )
+  script:
+    - |
+      if [ "$BLUE_ENVIRONMENT" == "production" ]
+      then
+      neutron floatingip-disassociate "$STAGING_IP_ID"
+      neutron floatingip-disassociate "$PRODUCTION_IP_ID"
+      neutron floatingip-associate "$PRODUCTION_IP_ID" "$GREEN_LB_PORT_ID"
+      neutron floatingip-associate "$STAGING_IP_ID" "$BLUE_LB_PORT_ID"
+      neutron lbaas-loadbalancer-update --description production green_loadbalancer
+      neutron lbaas-loadbalancer-update --description staging blue_loadbalancer
+      else
+      neutron floatingip-disassociate "$STAGING_IP_ID"
+      neutron floatingip-disassociate "$PRODUCTION_IP_ID"
+      neutron floatingip-associate "$PRODUCTION_IP_ID" "$BLUE_LB_PORT_ID"
+      neutron floatingip-associate "$STAGING_IP_ID" "$GREEN_LB_PORT_ID"
+      neutron lbaas-loadbalancer-update --description production blue_loadbalancer
+      neutron lbaas-loadbalancer-update --description staging green_loadbalancer
+      fi
+  dependencies:
+    - Build-environment
+    - Build-image
+    - Deploy-app-staging
+    - Acceptance-test
+  when: manual
+  only:
+    - main
+
+Roll-back:
+  stage: Production
+  image: ubuntu:20.04
+  needs: ["Build-environment", "Build-image", "Deploy-app-staging", "Acceptance-test", "Deploy"]
+  environment:
+    name: staging
+  before_script:
+    - cd ${TF_ROOT}/environment/
+    - apt-get update
+    - apt-get upgrade -y
+    - apt-get install -y jq
+    - apt install curl -y
+    - apt-get install -y python3-pip
+    - pip install python-openstackclient
+    - pip install python-neutronclient
+    - export OS_USERNAME=${OS_USERNAME}
+    - export OS_PASSWORD=${OS_PASSWORD}
+    - export OS_TENANT_NAME=${OS_TENANT_NAME}
+    - export OS_AUTH_URL=https://cscloud.lnu.se:5000/v3
+    - export OS_TENANT_ID=${OS_TENANT_ID}
+    - export OS_REGION_NAME=RegionOne
+    - export OS_USER_DOMAIN_NAME=default
+    - BLUE_ENVIRONMENT=$( cat ${TF_ROOT}/environment/playbooks/blue_loadbalancer_description.txt )
+    - GREEN_ENVIRONMENT=$( cat ${TF_ROOT}/environment/playbooks/green_loadbalancer_description.txt )
+    - BLUE_LB_PORT_ID=$( cat ${TF_ROOT}/environment/playbooks/blue_loadbalancer_port_id.txt )
+    - GREEN_LB_PORT_ID=$( cat ${TF_ROOT}/environment/playbooks/green_loadbalancer_port_id.txt )
+    - PRODUCTION_IP_ID=$( cat ${TF_ROOT}/environment/playbooks/production_ip_id.txt )
+    - STAGING_IP_ID=$( cat ${TF_ROOT}/environment/playbooks/staging_ip_id.txt )
+  script:
+    - |
+      if [ "$BLUE_ENVIRONMENT" == "production" ]
+      then
+      neutron floatingip-disassociate "$STAGING_IP_ID"
+      neutron floatingip-disassociate "$PRODUCTION_IP_ID"
+      neutron floatingip-associate "$PRODUCTION_IP_ID" "$BLUE_LB_PORT_ID"
+      neutron floatingip-associate "$STAGING_IP_ID" "$GREEN_LB_PORT_ID"
+      neutron lbaas-loadbalancer-update --description production blue_loadbalancer
+      neutron lbaas-loadbalancer-update --description staging green_loadbalancer
+      else
+      neutron floatingip-disassociate "$STAGING_IP_ID"
+      neutron floatingip-disassociate "$PRODUCTION_IP_ID"
+      neutron floatingip-associate "$PRODUCTION_IP_ID" "$GREEN_LB_PORT_ID"
+      neutron floatingip-associate "$STAGING_IP_ID" "$BLUE_LB_PORT_ID"
+      neutron lbaas-loadbalancer-update --description production green_loadbalancer
+      neutron lbaas-loadbalancer-update --description staging blue_loadbalancer
+      fi
+  dependencies:
+    - Build-environment
+    - Build-image
+    - Deploy-app-staging
+    - Acceptance-test
+    - Deploy
+  when: manual
+  only:
+    - main

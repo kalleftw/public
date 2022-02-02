@@ -1,0 +1,37 @@
+---
+      # - name: Remove old runner if (it exists)
+      #   command: docker rm -f gitlab-runner 2> /dev/null || true
+      #   ignore_errors: yes
+
+      - name: Use local system volume mounts to start the Runner container
+        command: docker run -d --name gitlab-runner --restart always -v /srv/gitlab-runner/config:/etc/gitlab-runner -v /var/run/docker.sock:/var/run/docker.sock gitlab/gitlab-runner:latest
+        ignore_errors: yes
+
+      # - name: Unregister the old runner (if it exists)
+      #   vars:
+      #     gitlab_runner_token: CHANGE_THIS_TO_YOUR_GITLAB_RUNNER_TOKEN
+      #     gitlab_runner_name: CHANGE_THIS_TO_YOUR_PREFERED_GITLAB_RUNNER_NAME
+      #   command: docker run --rm -i gitlab/gitlab-runner unregister --docker-privileged -r {{ gitlab_runner_token }} -name {{ gitlab_runner_name }} -u https://gitlab.lnu.se -n --executor docker
+      #   ignore_errors: yes
+
+      - name: Register the runner
+        vars:
+          gitlab_runner_token: CHANGE_THIS_TO_YOUR_GITLAB_RUNNER_TOKEN
+          gitlab_runner_name: CHANGE_THIS_TO_YOUR_PREFERED_GITLAB_RUNNER_NAME
+        command: docker run --rm -i -v /srv/gitlab-runner/config:/etc/gitlab-runner gitlab/gitlab-runner register --docker-privileged -r {{ gitlab_runner_token }} -name {{ gitlab_runner_name }} -u https://gitlab.lnu.se -n --executor docker --docker-image alpine --docker-volumes '/var/run/docker.sock:/var/run/docker.sock' 
+        ignore_errors: yes
+
+      - name: Sleep 20 seconds
+        command: sleep 20
+
+      - name: Add pull policy 'if-not-present' to the config.toml file
+        blockinfile:
+          path: /srv/gitlab-runner/config/config.toml
+          insertafter: 'shm_size = 0'
+          block: |4
+              pull_policy = ["if-not-present"]
+
+      # - name: Add pull policy 'if-not-present' to the config.toml file
+      #   shell:
+      #     cmd: sudo echo "    pull_policy = ["if-not-present"]" | sudo tee -a config.toml >/dev/null
+      #     chdir: /srv/gitlab-runner/config

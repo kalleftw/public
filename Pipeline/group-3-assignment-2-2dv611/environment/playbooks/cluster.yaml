@@ -1,0 +1,82 @@
+# Main config playbook. Creates a K8 cluster on target instances
+---
+- hosts: "{{ instance_color }}-bastion"
+  name: Ping bastion (SSH ping)
+  strategy: free
+  become: true
+  roles:
+    - ping
+
+- hosts: "{{ instance_color }}-all"
+  name: Ping all instances (SSH ping)
+  strategy: mitogen_free
+  become: true
+  roles:
+    - ping
+
+- hosts: "{{ instance_color }}-storage"
+  name: Install NFS server
+  strategy: mitogen_free
+  become: true
+  roles:
+    - nfsserver
+
+- hosts: "{{ instance_color }}-k8"
+  name: Install NFS client
+  strategy: mitogen_free
+  become: true
+  roles:
+    - nfsclient
+  vars:
+    - host_color: "{{ instance_color }}"
+    - storage_ip: "{{ hostvars[host_color + '-storage']['ansible_default_ipv4']['address'] }}"
+
+- hosts: "{{ instance_color }}-all"
+  name: Install Docker
+  strategy: mitogen_free
+  become: true
+  roles:
+    - docker
+    - enabledocker
+  vars:
+    - host_color: "{{ instance_color }}"
+    - registry_ip: "{{ hostvars[host_color + '-storage']['ansible_default_ipv4']['address'] }}"
+
+- hosts: "{{ instance_color }}-storage"
+  name: Create Docker registry
+  become: true
+  roles:
+    - dockerregistry
+
+- hosts: "{{ instance_color }}-k8"
+  name: Install Kubernetes (Kubelet & Kubeadm)
+  strategy: mitogen_free
+  become: true
+  roles:
+    - kubernetes
+
+- hosts: "{{ instance_color }}-master"
+  name: Install Kubernetes (Kubectl) and start cluster
+  become: true
+  roles:
+    - kubectl
+    - masternode
+  vars:
+    - pod_network_cidr: '{{ cidr }}'
+
+- hosts: "{{ instance_color }}-workers"
+  name: Worker nodes joins cluster
+  strategy: mitogen_free
+  become: true
+  roles:
+    - workernode
+  vars:
+    - node_color: '{{ instance_color }}'
+
+- hosts: "{{ instance_color }}-master"
+  name: Restart Docker on master
+  become: true
+  roles:
+    - restartdocker
+
+

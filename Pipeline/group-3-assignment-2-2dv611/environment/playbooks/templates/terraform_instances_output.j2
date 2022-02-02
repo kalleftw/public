@@ -1,0 +1,53 @@
+output "{{ color }}_bastion_name" {
+  value       = openstack_compute_instance_v2.{{ color }}_bastion.name
+  description = "The name of the {{ color }} bastion instance."
+}
+
+output "{{ color }}_bastion_public_ip" {
+  value       = openstack_networking_floatingip_v2.{{ color }}_bastion_IP.address
+  description = "The public IP address of the {{ color }} bastion instance."
+}
+
+output "{{ color }}_bastion_private_ip" {
+  value       = openstack_compute_instance_v2.{{ color }}_bastion.access_ip_v4
+  description = "The private IP address of the {{ color }} bastion instance."
+}
+
+output "{{ color }}_master_private_ip" {
+  value       = openstack_compute_instance_v2.{{ color }}_master.access_ip_v4
+  description = "The private IP address of the {{ color }} master instance."
+}
+
+output "{{ color }}_worker_instances" {
+  value       = var.instances
+  description = "Number of worker instances"
+}
+
+output "{{ color }}_worker_ip" {
+  value       = slice([for index in openstack_compute_instance_v2.{{ color }}_worker : index.access_ip_v4], 0, var.instances)
+description = "IPv4-address of the {{ color }}workers"
+}
+
+output "ansible_inventory" {
+  value = templatefile("${path.module}/inventory.tmpl", {
+    color           = var.color
+    master-name     = openstack_compute_instance_v2.{{ color }}_master.name,
+    master-ip       = openstack_compute_instance_v2.{{ color }}_master.access_ip_v4,
+    worker_name     = slice([for index in openstack_compute_instance_v2.{{ color }}_worker : index.name], 0, var.instances),
+    worker-ip       = slice([for index in openstack_compute_instance_v2.{{ color }}_worker : index.access_ip_v4], 0, var.instances),
+    storage-name    = openstack_compute_instance_v2.{{ color }}_storage.name,
+    storage-ip      = openstack_compute_instance_v2.{{ color }}_storage.access_ip_v4,
+    bastion-name    = openstack_compute_instance_v2.{{ color }}_bastion.name,
+    bastion-public  = openstack_networking_floatingip_v2.{{ color }}_bastion_IP.address,
+    bastion-private = openstack_compute_instance_v2.{{ color }}_bastion.access_ip_v4,
+    key_name        = var.key_name
+    }
+  )
+}
+
+output "ansible_cfg" {
+  value = templatefile("${path.module}/ansible_config.tmpl", {
+    key-name = var.key_name
+    }
+  )
+}

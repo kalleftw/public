@@ -1,0 +1,10 @@
+---
+      - name: Use local system volume mounts to start the Runner container
+        command: docker run -d --name gitlab-runner --restart always -v /srv/gitlab-runner/config:/etc/gitlab-runner -v /var/run/docker.sock:/var/run/docker.sock gitlab/gitlab-runner:latest
+        ignore_errors: yes
+
+      - name: Register the runner
+        vars:
+          gitlab_runner_token: CHANGE_THIS_TO_YOUR_GITLAB_RUNNER_TOKEN
+        command: docker run --rm -it -v /srv/gitlab-runner/config:/etc/gitlab-runner gitlab/gitlab-runner register --docker-privileged -r {{ gitlab_runner_token }} -name 2dv611_grp3_runner -u https://gitlab.lnu.se -n --executor docker --docker-image alpine --docker-volumes '/var/run/docker.sock:/var/run/docker.sock' 
+        ignore_errors: yes

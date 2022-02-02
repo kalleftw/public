@@ -1,0 +1,26 @@
+stages:
+  - Dependencies
+  - Test
+  - Build
+  - Staging
+  - Production
+  - Destroy
+
+variables:
+  DOCKER_DRIVER: overlay2
+  TF_ADDRESS: ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/terraform/state/user${GITLAB_USER_ID}
+  TF_ROOT: ${CI_PROJECT_DIR}
+  COMMIT_AUTHOR: ${CI_COMMIT_AUTHOR}
+  CURRENT_USER: ${GITLAB_USER_NAME}
+  CURRENT_USER_EMAIL: ${GITLAB_USER_EMAIL}
+  CURRENT_USER_ID: ${GITLAB_USER_ID}
+  RUNNER_TOKEN: ${PROJECT_RUNNER_TOKEN}
+
+include:
+  - local: .gitlab/ci/_workflow.gitlab-ci.yml
+  - local: .gitlab/ci/test.gitlab-ci.yml
+  - local: .gitlab/ci/build.gitlab-ci.yml
+  - local: .gitlab/ci/staging.gitlab-ci.yml
+  - local: .gitlab/ci/dependencies.gitlab-ci.yml
+  - local: .gitlab/ci/production.gitlab-ci.yml
+  - local: .gitlab/ci/destroy.gitlab-ci.yml

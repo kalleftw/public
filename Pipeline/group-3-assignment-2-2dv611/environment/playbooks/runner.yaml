@@ -1,0 +1,14 @@
+---
+- hosts: runner
+  become: true
+  roles:
+    - ping
+    - docker_runner
+    - runner
+  vars:
+    gitlab_runner_token: CHANGE_THIS_TO_YOUR_GITLAB_RUNNER_TOKEN
+    gitlab_runner_name: CHANGE_THIS_TO_YOUR_PREFERED_GITLAB_RUNNER_NAME
+
+
+
+

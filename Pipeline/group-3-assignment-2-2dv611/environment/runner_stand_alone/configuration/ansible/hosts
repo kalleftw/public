@@ -1,0 +1,5 @@
+[runners]
+runner ansible_host=194.47.177.36 ansible_user=ubuntu
+
+[all:vars]
+ansible_python_interpreter=/usr/bin/python3

@@ -1,0 +1,74 @@
+---
+  - name: Remove old deployments
+    command: kubectl delete all --all
+    retries: 3
+    delay: 5
+
+  - name: Create db pv
+    command: kubectl apply -f -
+    args:
+      stdin: "{{ lookup('template', playbook_dir + '/templates/mongo_pv.j2') }}"
+    retries: 3
+    delay: 3
+
+  - name: Create db pvc
+    command: kubectl apply -f -
+    args:
+      stdin: "{{ lookup('template', playbook_dir + '/templates/mongo_pvc.j2') }}"
+    retries: 3
+    delay: 3
+
+  - name: Create db deployment
+    command: kubectl apply -f -
+    args:
+      stdin: "{{ lookup('template', playbook_dir + '/templates/mongo_deployment.j2') }}"
+    retries: 3
+    delay: 3
+
+  - name: Create db svc
+    command: kubectl apply -f -
+    args:
+      stdin: "{{ lookup('template', playbook_dir + '/templates/mongo_svc.j2') }}"
+    retries: 3
+    delay: 3
+
+  - name: Create app svc
+    command: kubectl apply -f -
+    args:
+      stdin: "{{ lookup('template', playbook_dir + '/templates/app_svc.j2') }}"
+    retries: 3
+    delay: 3
+
+  - name: Create app deployment
+    command: kubectl apply -f -
+    args:
+      stdin: "{{ lookup('template', playbook_dir + '/templates/app_deployment.j2') }}"
+    retries: 3
+    delay: 3
+
+  - name: Create proxy configmap
+    command: kubectl apply -f -
+    args:
+      stdin: "{{ lookup('template', playbook_dir + '/templates/proxy_config.j2') }}"
+    retries: 3
+    delay: 3
+
+  - name: Create proxy svc
+    command: kubectl apply -f -
+    args:
+      stdin: "{{ lookup('template', playbook_dir + '/templates/proxy_svc.j2') }}"
+    retries: 3
+    delay: 3
+
+  - name: Create proxy svc
+    command: kubectl apply -f -
+    args:
+      stdin: "{{ lookup('template', playbook_dir + '/templates/proxy_deployment.j2') }}"
+    retries: 3
+    delay: 3
+
+
+
+
+
+

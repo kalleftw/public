@@ -1,0 +1,124 @@
+Node-modules:
+  stage: Dependencies
+  image: node:14-alpine
+  services:
+    - mongo:latest
+  variables:
+    MONGO_URL: 'mongodb://mongo/calc'
+  script:
+    - npm --prefix ./src install ./src
+  artifacts:
+    name: 'artifacts'
+    untracked: true
+    expire_in: 30 mins
+    paths:
+      - ./src/npm/
+      - ./src/node_modules/
+
+# Deployment-status:
+#   stage: Dependencies
+#   image: ubuntu:20.04
+#   before_script:
+#     - apt-get update
+#     - apt-get upgrade -y
+#     - apt-get install -y python3-pip
+#     - pip install python-openstackclient
+#     - pip install python-neutronclient
+#   script:
+#     - export OS_USERNAME=${OS_USERNAME}
+#     - export OS_PASSWORD=${OS_PASSWORD}
+#     - export OS_TENANT_NAME=${OS_TENANT_NAME}
+#     - export OS_AUTH_URL=https://cscloud.lnu.se:5000/v3
+#     - export OS_TENANT_ID=${OS_TENANT_ID}
+#     - export OS_REGION_NAME=RegionOne
+#     - export OS_USER_DOMAIN_NAME=default
+#     - openstack server list
+#     - neutron lbaas-loadbalancer-list
+#     - neutron lbaas-pool-list
+#     - neutron floatingip-list
+
+
+Terraform-files:
+  stage: Dependencies
+  image: willhallonline/ansible:2.10-ubuntu-20.04
+  before_script:
+    - cd ${TF_ROOT}
+    - chmod 755 ${TF_ROOT}/environment/playbooks
+    - cd ${TF_ROOT}/environment/playbooks
+  script:
+    - ansible-playbook terraform_templates.yaml --e "color=blue"
+    - ansible-playbook terraform_templates.yaml --e "color=green"
+    - cat ${TF_ROOT}/environment/blue_instances/provisioning/main.tf
+    - cat ${TF_ROOT}/environment/blue_instances/provisioning/output.tf
+    - cat ${TF_ROOT}/environment/green_instances/provisioning/main.tf
+    - cat ${TF_ROOT}/environment/green_instances/provisioning/output.tf
+  artifacts:
+    name: terraform-files-$CI_COMMIT_REF_SLUG
+    paths:
+      - ${TF_ROOT}/environment/blue_instances/provisioning/main.tf
+      - ${TF_ROOT}/environment/blue_instances/provisioning/output.tf
+      - ${TF_ROOT}/environment/green_instances/provisioning/main.tf
+      - ${TF_ROOT}/environment/green_instances/provisioning/output.tf
+
+
+Terraform-init:
+  stage: Dependencies
+  image: registry.gitlab.com/gitlab-org/terraform-images/stable:latest
+  needs: ["Terraform-files"]
+  before_script:
+    - cd ${TF_ROOT}
+    - cat ${TF_ROOT}/environment/blue_instances/provisioning/main.tf
+    - cat ${TF_ROOT}/environment/blue_instances/provisioning/output.tf
+    - cat ${TF_ROOT}/environment/green_instances/provisioning/main.tf
+    - cat ${TF_ROOT}/environment/green_instances/provisioning/output.tf
+  script:
+    - export TF_VAR_username=${OS_USERNAME}
+    - export TF_VAR_password=${OS_PASSWORD}
+    - export TF_VAR_external_gateway=${OS_EXTERNAL_GATEWAY}
+    - export TF_VAR_tenant_name=${OS_TENANT_NAME}
+    - export TF_VAR_tenant_id=${OS_TENANT_ID}
+    - export TF_VAR_key_pair=${OS_KEY_PAIR}
+    - export TF_VAR_key_name=${OS_KEY_NAME}
+    - export TF_VAR_gitlab_token=${RUNNER_TOKEN}
+    - gitlab-terraform init -reconfigure # gitlab-terraform init -reconfigure
+    - gitlab-terraform validate
+  dependencies:
+    - Terraform-files
+  cache:
+    key: user${GITLAB_USER_ID}
+    paths:
+      - ${TF_ROOT}/.terraform
+
+Terraform-plan:
+  stage: Dependencies
+  image: registry.gitlab.com/gitlab-org/terraform-images/stable:latest
+  needs: ["Terraform-files", "Terraform-init"]
+  before_script:
+    - cd ${TF_ROOT}
+    - cat ${TF_ROOT}/environment/blue_instances/provisioning/main.tf
+    - cat ${TF_ROOT}/environment/blue_instances/provisioning/output.tf
+    - cat ${TF_ROOT}/environment/green_instances/provisioning/main.tf
+    - cat ${TF_ROOT}/environment/green_instances/provisioning/output.tf
+  script:
+    - export TF_VAR_username=${OS_USERNAME}
+    - export TF_VAR_password=${OS_PASSWORD}
+    - export TF_VAR_external_gateway=${OS_EXTERNAL_GATEWAY}
+    - export TF_VAR_tenant_name=${OS_TENANT_NAME}
+    - export TF_VAR_tenant_id=${OS_TENANT_ID}
+    - export TF_VAR_key_pair=${OS_KEY_PAIR}
+    - export TF_VAR_key_name=${OS_KEY_NAME}
+    - export TF_VAR_gitlab_token=${RUNNER_TOKEN}
+    - gitlab-terraform plan -lock=false
+    - gitlab-terraform plan-json
+  dependencies:
+    - Terraform-files
+  cache:
+    key: user${GITLAB_USER_ID}
+    paths:
+      - ${TF_ROOT}/.terraform
+  artifacts:
+    name: Terraform-plan
+    paths:
+      - ${TF_ROOT}/plan.cache
+    reports:
+      terraform: ${TF_ROOT}/plan.json

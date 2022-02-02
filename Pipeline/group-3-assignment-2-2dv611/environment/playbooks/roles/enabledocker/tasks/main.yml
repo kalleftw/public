@@ -1,0 +1,9 @@
+# Install kubectl
+# Source: https://gitlab.lnu.se/1dv032/student/fl222ai/exam-3/-/blob/master/scripts/ansible/dockerK8.yaml
+---
+     - name: reload systemd
+       command: systemctl daemon-reload
+     - name: restart docker
+       command: systemctl restart docker
+     - name: enable docker
+       command: systemctl enable docker

@@ -1,0 +1,6 @@
+---
+  - name: 'Run ansible playbook on {{ module }} module!!!!!!!!!!!!!!!!!'
+    import_playbook: '{{ playbook_dir }}/../{{ module }}/configuration/main.yaml'
+
+
+  

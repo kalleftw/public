@@ -1,0 +1,182 @@
+terraform {
+  required_version = ">= 0.14.0"
+  required_providers {
+    openstack = {
+      source  = "terraform-provider-openstack/openstack"
+      version = "~> 1.35.0"
+    }
+  }
+}
+
+resource "openstack_compute_instance_v2" "{{ color }}_bastion" {
+  name              = "{{ color }}-bastion"
+  image_id          = "ca4bec1a-ac25-434f-b14c-ad8078ccf39f"
+  flavor_name       = "c2-r4-d20"
+  key_pair          = var.key_pair
+  security_groups   = ["default", "secgroup_ssh"]
+  availability_zone = "Education"
+
+  network {
+    name = var.network_name
+  }
+}
+
+resource "openstack_networking_floatingip_v2" "{{ color }}_bastion_IP" {
+  pool = "public"
+}
+
+resource "openstack_compute_floatingip_associate_v2" "fip_ass1" {
+  floating_ip = openstack_networking_floatingip_v2.{{ color }}_bastion_IP.address
+  instance_id = openstack_compute_instance_v2.{{ color }}_bastion.id
+}
+
+resource "openstack_compute_instance_v2" "{{ color }}_master" {
+  name              = "{{ color }}-master"
+  image_id          = "ca4bec1a-ac25-434f-b14c-ad8078ccf39f"
+  flavor_name       = "c2-r2-d20"
+  key_pair          = var.key_pair
+  security_groups   = ["default", "secgroup_ssh"]
+  availability_zone = "Education"
+
+  network {
+    name = var.network_name
+  }
+}
+resource "openstack_compute_instance_v2" "{{ color }}_worker" {
+  count             = var.instances
+  name              = var.instance_names[count.index]
+  image_id          = "ca4bec1a-ac25-434f-b14c-ad8078ccf39f"
+  flavor_name       = "c2-r2-d20"
+  key_pair          = var.key_pair
+  security_groups   = ["default", "secgroup_ssh", var.sec_group_proxyport]
+  availability_zone = "Education"
+
+  network {
+    name = var.network_name
+  }
+}
+
+resource "openstack_compute_instance_v2" "{{ color }}_storage" {
+  name              = "{{ color }}-storage"
+  image_id          = "ca4bec1a-ac25-434f-b14c-ad8078ccf39f"
+  flavor_name       = "c2-r2-d40"
+  key_pair          = var.key_pair
+  security_groups   = ["default", "secgroup_ssh"]
+  availability_zone = "Education"
+
+  network {
+    name = var.network_name
+  }
+}
+
+resource "time_sleep" "wait_5_seconds" {
+  depends_on = [
+    openstack_compute_instance_v2.{{ color }}_bastion, openstack_compute_instance_v2.{{ color }}_master,
+    openstack_compute_instance_v2.{{ color }}_worker, openstack_compute_instance_v2.{{ color }}_storage
+  ]
+
+  triggers = {
+    always_run = "${timestamp()}"
+  }
+
+  create_duration = "5s"
+}
+
+resource "local_file" "ansible_hostsfile" {
+  depends_on = [
+    openstack_compute_instance_v2.{{ color }}_bastion, openstack_compute_instance_v2.{{ color }}_master,
+    openstack_compute_instance_v2.{{ color }}_worker, openstack_compute_instance_v2.{{ color }}_storage, time_sleep.wait_5_seconds
+  ]
+
+  content = templatefile("${path.module}/inventory.tmpl", {
+    color           = var.color
+    master-name     = openstack_compute_instance_v2.{{ color }}_master.name,
+    master-ip       = openstack_compute_instance_v2.{{ color }}_master.access_ip_v4,
+    worker_name     = slice([for index in openstack_compute_instance_v2.{{ color }}_worker : index.name], 0, var.instances),
+    worker-ip       = slice([for index in openstack_compute_instance_v2.{{ color }}_worker : index.access_ip_v4], 0, var.instances),
+    storage-name    = openstack_compute_instance_v2.{{ color }}_storage.name,
+    storage-ip      = openstack_compute_instance_v2.{{ color }}_storage.access_ip_v4,
+    bastion-name    = openstack_compute_instance_v2.{{ color }}_bastion.name,
+    bastion-public  = openstack_networking_floatingip_v2.{{ color }}_bastion_IP.address,
+    bastion-private = openstack_compute_instance_v2.{{ color }}_bastion.access_ip_v4,
+    key_name        = var.key_name
+    }
+  )
+  filename = "../../playbooks/inventory/{{ color }}_hosts"
+}
+
+
+
+resource "local_file" "ansible_config_file" {
+  depends_on = [
+    openstack_compute_instance_v2.{{ color }}_bastion, openstack_compute_instance_v2.{{ color }}_master,
+    openstack_compute_instance_v2.{{ color }}_worker, openstack_compute_instance_v2.{{ color }}_storage, time_sleep.wait_5_seconds
+  ]
+
+  content = templatefile("${path.module}/ansible_config.tmpl", {
+    key-name = var.key_name
+    }
+  )
+  filename = "../../playbooks/ansible.cfg"
+}
+
+
+variable "username" {
+  type = string
+}
+
+variable "password" {
+  type      = string
+  sensitive = true
+}
+
+variable "external_gateway" {
+  type = string
+}
+
+variable "tenant_name" {
+  type = string
+}
+
+variable "tenant_id" {
+  type = string
+}
+
+variable "key_pair" {
+  type      = string
+  sensitive = true
+}
+
+variable "key_name" {
+  type = string
+}
+
+variable "network_name" {
+  type = string
+  default = "testNet"
+}
+
+variable "color" {
+  type = string
+  default = "{{ color }}"
+}
+
+variable "instances" {
+  description = "Number of worker instances:"
+  type        = number
+  default     = 1
+
+  validation {
+    condition     = contains([1, 2], var.instances)
+    error_message = "Valid values for: instances are (1, 2)."
+  }
+}
+
+variable "instance_names" {
+  type    = list(string)
+  default = ["{{ color }}-worker-1", "{{ color }}-worker-2", "{{ color }}-worker-3"]
+}
+
+variable "sec_group_proxyport" {
+  type = string
+}

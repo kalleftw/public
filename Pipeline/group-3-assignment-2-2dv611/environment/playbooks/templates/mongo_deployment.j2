@@ -1,0 +1,28 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ app }}-mongodb
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ app }}-mongodb
+  template:
+    metadata:
+      labels:
+        app: {{ app }}-mongodb
+    spec:
+      containers:
+        - name: {{ app }}-mongodb
+          image: mongo:latest
+          volumeMounts:
+            - name: {{ app }}-mongodb-volume
+              mountPath: /data/db
+          ports:
+            - containerPort: {{ db_port }}
+          
+      volumes:
+        - name: {{ app }}-mongodb-volume
+          persistentVolumeClaim:
+            claimName: {{ app }}-mongodb-pvc

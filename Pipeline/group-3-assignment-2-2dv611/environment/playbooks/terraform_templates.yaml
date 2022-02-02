@@ -1,0 +1,9 @@
+
+- name: 'Create terraform files from templates'
+  hosts: localhost
+  connection: local
+  tasks:
+    - include_role: 
+        name: terraform_templates
+      vars:
+        color: '{{ color }}'

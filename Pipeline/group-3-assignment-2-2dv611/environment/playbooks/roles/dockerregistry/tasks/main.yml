@@ -1,0 +1,16 @@
+---
+#Source: https://docs.docker.com/registry/deploying/
+  - name: Create a Docker registry
+    file:
+      path: "docker/registry"
+      state: directory
+      recurse: yes
+
+  - name: Remove old registry if it exists
+    become: true
+    command: docker rm -f registry 2> /dev/null || true
+
+  - name: Run the registry
+    become: true
+    command: docker container run -d -p 5000:5000 --restart=always --name registry -v ~/docker/registry:/var/lib/registry registry
+

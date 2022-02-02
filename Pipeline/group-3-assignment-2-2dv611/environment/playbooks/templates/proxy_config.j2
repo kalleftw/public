@@ -1,0 +1,21 @@
+{#..#}
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ app }}-proxy-config
+data:
+  config: |
+    upstream svc {
+        server {{ app }}.default.svc.cluster.local:{{ exposed_port }} fail_timeout=0;
+    }
+
+    server {
+        listen       {{ exposed_port }};
+        server_name  {{ app }};
+
+        location / {
+          proxy_pass http://svc;
+        }
+    }
+

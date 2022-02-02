@@ -1,0 +1,8 @@
+# Install kubectl
+# Source: https://gitlab.lnu.se/1dv032/student/fl222ai/exam-3/-/blob/master/scripts/ansible/dockerK8.yaml
+---
+     - name: install kubectl
+       apt:
+         name: kubectl
+         state: latest
+         force: yes

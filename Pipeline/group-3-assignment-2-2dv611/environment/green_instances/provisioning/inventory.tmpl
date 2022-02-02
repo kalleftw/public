@@ -1,0 +1,35 @@
+[${color}-masters]
+${master-name} ansible_host=${master-ip} ansible_user=ubuntu
+
+[${color}-workers]
+%{ for index, addr in worker-ip ~}
+${worker_name[index]} ansible_host=${addr} ansible_user=ubuntu
+%{ endfor ~}
+
+[${color}-storages]
+${storage-name} ansible_host=${storage-ip} ansible_user=ubuntu
+
+[${color}-k8:children]
+${color}-masters
+${color}-workers
+
+[${color}-all:children]
+${color}-masters
+${color}-workers
+${color}-storages
+
+[${color}-bastions]
+${bastion-name} ansible_host=${bastion-public} ansible_user=ubuntu ansible_ssh_extra_args='-o ForwardAgent=yes'
+
+[all:vars]
+ansible_python_interpreter=/usr/bin/python3
+ansible_ssh_common_args='-o StrictHostKeyChecking=no'
+
+[${color}-masters:vars]
+mitogen_via = ${color}-bastion
+
+[${color}-workers:vars]
+mitogen_via = ${color}-bastion
+
+[${color}-storages:vars]
+mitogen_via = ${color}-bastion
