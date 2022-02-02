@@ -1,3 +1,3 @@
-This is a group project.
+This is a group project. Credits are due for Fredrik Ljungner, Joel Salo, Elias Frigård and Eric Haga.
 
 It's a CI/CD pipeline created to maintain a calculator application using CI/CD, one push runs unit tests, builds docker image, runs smoke and acceptance tests and pushes to staging environtment (blue/green) and manual deployment.
